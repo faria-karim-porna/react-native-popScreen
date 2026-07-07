@@ -1,0 +1,50 @@
+# Development / source files not needed at runtime
+src/
+android/src/test/
+android/src/androidTest/
+example/
+.github/
+__tests__/
+__mocks__/
+*.test.*
+*.spec.*
+
+# Example app files (not part of the library)
+App.js
+OverlaySwitcher.js
+index.js
+app.json
+demos/
+assets/
+
+# Expo generated cache
+.expo/
+
+# Documentation (only README.md is needed)
+docs/
+*.md
+!README.md
+
+# Build tools
+.eslintrc*
+.prettierrc*
+tsconfig*.json
+babel.config.*
+jest.setup.js
+
+# Editor / OS / AI config
+.idea/
+.vscode/
+.claude/
+.DS_Store
+*.swp
+*.swo
+
+# Android build artifacts
+android/.gradle/
+android/app/build/
+android/build/
+android/captures/
+android/local.properties
+*.keystore
+*.jks

@@ -1,0 +1,1 @@
+{"version":3,"file":"useExternalStore.d.ts","sourceRoot":"","sources":["../src/useExternalStore.ts"],"names":[],"mappings":"AACA,OAAO,EAAE,YAAY,EAAE,MAAM,sBAAsB,CAAC;AAEpD;;;;GAIG;AACH,wBAAgB,gBAAgB,CAAC,CAAC,SAAS,MAAM,CAAC,MAAM,EAAE,GAAG,CAAC,EAAE,CAAC,EAC/D,KAAK,EAAE,YAAY,CAAC,CAAC,CAAC,EACtB,QAAQ,EAAE,CAAC,KAAK,EAAE,CAAC,KAAK,CAAC,GACxB,CAAC,CAEH"}

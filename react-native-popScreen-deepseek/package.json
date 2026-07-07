@@ -1,42 +1,61 @@
 {
-  "name": "react-native-popscreen-deepseek",
+  "name": "popscreen",
   "version": "1.0.0",
-  "main": "index.js",
-  "dependencies": {
-    "expo": "~57.0.2",
-    "expo-dev-client": "~57.0.5",
-    "expo-status-bar": "~57.0.0",
-    "react": "19.2.3",
-    "react-native": "0.86.0"
+  "description": "Android-only floating overlay library for React Native (Expo). Render any RN UI as a system-level floating window.",
+  "main": "build/index.js",
+  "types": "build/index.d.ts",
+  "exports": {
+    ".": {
+      "import": "./build/index.js",
+      "require": "./build/index.js",
+      "types": "./build/index.d.ts"
+    }
   },
   "scripts": {
-    "start": "expo start",
-    "android": "expo run:android",
-    "ios": "expo run:ios",
-    "web": "expo start --web",
+    "build": "tsc --project tsconfig.build.json",
     "build:plugin": "cd plugin && npx tsc",
+    "clean": "node -e \"require('fs').rmSync('build', {recursive: true, force: true})\"",
     "test": "jest",
     "test:ci": "jest --ci --coverage",
+    "prepare": "npm run build && npm run build:plugin",
     "typecheck": "tsc --noEmit"
   },
+  "keywords": [
+    "react-native",
+    "expo",
+    "android",
+    "overlay",
+    "floating",
+    "picture-in-picture",
+    "bubble",
+    "window-manager"
+  ],
+  "repository": {
+    "type": "git",
+    "url": "https://github.com/YOUR_USERNAME/popscreen.git"
+  },
+  "bugs": {
+    "url": "https://github.com/YOUR_USERNAME/popscreen/issues"
+  },
+  "homepage": "https://github.com/YOUR_USERNAME/popscreen#readme",
+  "license": "MIT",
+  "author": "YOUR NAME <your@email.com>",
+  "peerDependencies": {
+    "expo": "*",
+    "react": "*",
+    "react-native": "*"
+  },
+  "peerDependenciesMeta": {
+    "expo": { "optional": true }
+  },
+  "expo-module": {
+    "platforms": ["android"]
+  },
   "jest": {
-    "setupFiles": [
-      "./jest.setup.js"
-    ],
-    "moduleFileExtensions": [
-      "ts",
-      "tsx",
-      "js",
-      "jsx",
-      "json"
-    ],
+    "setupFiles": ["./jest.setup.js"],
+    "moduleFileExtensions": ["ts", "tsx", "js", "jsx", "json"],
     "transform": {
-      "^.+\\.[jt]sx?$": [
-        "babel-jest",
-        {
-          "configFile": "./babel.config.jest.js"
-        }
-      ]
+      "^.+\\.[jt]sx?$": ["babel-jest", { "configFile": "./babel.config.jest.js" }]
     },
     "transformIgnorePatterns": [
       "node_modules/(?!(react-native|@react-native|expo|@expo|react-native-gesture-handler)/)"
@@ -45,7 +64,6 @@
       "^react-native$": "<rootDir>/node_modules/react-native"
     }
   },
-  "private": true,
   "devDependencies": {
     "@react-native/jest-preset": "^0.86.0",
     "@testing-library/react-hooks": "^8.0.1",

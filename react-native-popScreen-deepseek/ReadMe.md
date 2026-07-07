@@ -94,7 +94,7 @@ This project was built incrementally across 8 milestones:
 | **5** | State sync & hook API — `usePopScreen(key, default)` backed by module-scoped store (no Context), Counter & Input Submit demos proving cross-surface sync vs local state. |
 | **6** | Lifecycle hardening — permission revocation poll, `destroy()` API, `onWindowStateChange` events, battery optimization functions, `START_NOT_STICKY`, `onConfigurationChanged`. |
 | **7** | Testing & docs — 19 Jest tests (createOverlayStore, usePopScreen, minimizeRestore, PopScreenContent) with native module mocks. Android JUnit + instrumented tests. GitHub Actions CI (JS tests + Android build + plugin build). Publishable README, API reference, Play policy guidance, known limitations docs, state sync docs. Demo app polish with inline JSDoc comments explaining each demo. TypeScript infrastructure (tsconfig, @types/jest, typecheck). |
-| **8** | Publication — npm publish, versioning, changelog. |
+| **8** | Publication — `package.json` restructured as npm library (peerDeps, exports, expo-module config). Production `tsconfig.build.json`, `.npmignore`, `expo-module.config.json`. `CHANGELOG.md` (v1.0.0), `docs/compatibility.md` (version/device matrix). Build verified via `tsc`, tests 19/19 pass, `npm pack --dry-run` clean (50 files, ~65KB). |
 
 ## License
 

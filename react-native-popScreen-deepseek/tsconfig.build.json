@@ -1,0 +1,24 @@
+{
+  "compilerOptions": {
+    "target": "ES2019",
+    "module": "commonjs",
+    "lib": ["ES2019"],
+    "outDir": "build",
+    "rootDir": "src",
+    "strict": true,
+    "jsx": "react-jsx",
+    "esModuleInterop": true,
+    "skipLibCheck": true,
+    "forceConsistentCasingInFileNames": true,
+    "declaration": true,
+    "declarationMap": true,
+    "sourceMap": true,
+    "moduleResolution": "node10",
+    "ignoreDeprecations": "6.0",
+    "allowJs": true,
+    "resolveJsonModule": true,
+    "types": []
+  },
+  "include": ["src/**/*"],
+  "exclude": ["src/__tests__", "src/__mocks__"]
+}
