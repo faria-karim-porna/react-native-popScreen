@@ -1,13 +1,14 @@
-# PopScreen Spike — Milestone 0
+# PopScreen Spike — Milestone 0 & 1
 
-**Goal:** Prove that a live React Native surface can render and auto-update inside a `TYPE_APPLICATION_OVERLAY` system window with zero native involvement per update.
+**Milestone 0 — Spike / Validation**
+Prove that a live React Native surface can render and auto-update inside a `TYPE_APPLICATION_OVERLAY` system window with zero native involvement per update.
 
-**What was built:**
-- Expo project (SDK 57 / RN 0.86) with `expo-dev-client` and native Android prebuild.
-- `OverlayService` — a foreground `Service` that creates a system overlay window via `WindowManager` and hosts a second React surface using `ReactHost.createSurface()` (New Architecture).
-- `OverlaySpikeModule` + `OverlaySpikePackage` — a native module exposing `hasOverlayPermission`, `requestOverlayPermission`, `startOverlay`, and `stopOverlay` to JS.
-- `OverlayRoot.js` — overlay content rendering a live "Tick: N" counter that increments every 1s via plain `useState`/`setInterval`, proving RN re-renders flow into the overlay automatically.
+- `OverlayService` — foreground `Service` creating a system overlay via `WindowManager`, hosting a second React surface (`ReactHost.createSurface()`) on the New Architecture.
+- `PopScreenModule` + `PopScreenPackage` — native module exposing `hasOverlayPermission`, `requestOverlayPermission`, `startOverlay`, and `stopOverlay` to JS.
+- `OverlayRoot.js` — overlay content with a live "Tick: N" counter (proves RN re-renders flow automatically).
 - `App.js` — host app control panel with permission, start, and stop buttons.
-- `AndroidManifest.xml` — declared `SYSTEM_ALERT_WINDOW`, `FOREGROUND_SERVICE`, `FOREGROUND_SERVICE_SPECIAL_USE` permissions and the overlay service.
 
-**Next step:** Build and run on a POCO M3 (or any Android device) with `npx expo run:android` and follow the manual test sequence in `milestone-0-implementation.md`.
+**Milestone 1 — Expo Module Scaffolding**
+Native module renamed to `PopScreenModule` + `PopScreenPackage`. Added `getReactArchitectureInfo()` to detect New vs Old React Native architecture. Created Expo config plugin (`plugin/src/index.ts` + `app.plugin.js`) that injects overlay permissions and service declaration into `AndroidManifest.xml`. Added TypeScript types and wrappers (`src/`). Wired plugin into `app.json`. Updated `App.js` to display detected architecture info.
+
+**Next step:** Build and run on a POCO M3 with `npx expo run:android`, verify architecture detection shows `NEW_ARCHITECTURE`, and confirm permission round-trip works end-to-end.

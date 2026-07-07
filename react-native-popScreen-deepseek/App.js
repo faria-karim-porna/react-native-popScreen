@@ -1,31 +1,49 @@
-import React from 'react';
+import React, { useEffect, useState, useCallback } from 'react';
 import { View, Text, Button, StyleSheet, NativeModules } from 'react-native';
 import { StatusBar } from 'expo-status-bar';
 
-const { OverlaySpikeModule } = NativeModules;
+const { PopScreen } = NativeModules;
 
 export default function App() {
-  const [hasPermission, setHasPermission] = React.useState(false);
-  const [overlayRunning, setOverlayRunning] = React.useState(false);
+  const [hasPermission, setHasPermission] = useState(false);
+  const [overlayRunning, setOverlayRunning] = useState(false);
+  const [archInfo, setArchInfo] = useState('checking...');
 
-  React.useEffect(() => {
-    OverlaySpikeModule.hasOverlayPermission().then(setHasPermission);
+  const checkPermission = useCallback(() => {
+    PopScreen?.hasOverlayPermission().then(setHasPermission);
   }, []);
+
+  useEffect(() => {
+    checkPermission();
+    // Also detect the RN architecture this app is running on
+    PopScreen?.getReactArchitectureInfo().then((info) => {
+      setArchInfo(
+        `${info.architecture}${info.isNewArchitecture ? ' (New Arch)' : ' (Old Arch)'}`
+      );
+    }).catch(() => {
+      setArchInfo('UNKNOWN (detection failed)');
+    });
+  }, [checkPermission]);
 
   return (
     <View style={styles.container}>
-      <Text style={styles.title}>PopScreen Spike — Host App</Text>
+      <Text style={styles.title}>PopScreen — Milestone 1 Verification</Text>
       <StatusBar style="auto" />
 
       <View style={styles.infoRow}>
-        <Text>Overlay permission: </Text>
+        <Text style={styles.label}>Overlay permission: </Text>
         <Text style={hasPermission ? styles.granted : styles.denied}>
           {String(hasPermission)}
         </Text>
       </View>
 
       <View style={styles.infoRow}>
-        <Text>Overlay running: </Text>
+        <Text style={styles.label}>Architecture: </Text>
+        <Text style={styles.archText}>{archInfo}</Text>
+      </View>
+
+      <View style={styles.infoRow}>
+        <Text style={styles.label}>Overlay running: </Text>
         <Text style={overlayRunning ? styles.granted : styles.denied}>
           {String(overlayRunning)}
         </Text>
@@ -34,7 +52,12 @@ export default function App() {
       <View style={styles.buttonGroup}>
         <Button
           title="Request Overlay Permission"
-          onPress={() => OverlaySpikeModule.requestOverlayPermission()}
+          onPress={() => PopScreen?.requestOverlayPermission()}
+        />
+        <View style={styles.spacer} />
+        <Button
+          title="Re-check Permission"
+          onPress={checkPermission}
         />
         <View style={styles.spacer} />
         <Button
@@ -42,7 +65,7 @@ export default function App() {
           disabled={!hasPermission}
           onPress={() => {
             setOverlayRunning(true);
-            OverlaySpikeModule.startOverlay();
+            PopScreen?.startOverlay();
           }}
         />
         <View style={styles.spacer} />
@@ -51,7 +74,7 @@ export default function App() {
           disabled={!overlayRunning}
           onPress={() => {
             setOverlayRunning(false);
-            OverlaySpikeModule.stopOverlay();
+            PopScreen?.stopOverlay();
           }}
         />
       </View>
@@ -72,14 +95,24 @@ const styles = StyleSheet.create({
     padding: 20,
   },
   title: {
-    fontSize: 18,
+    fontSize: 16,
     fontWeight: 'bold',
-    marginBottom: 16,
+    marginBottom: 20,
+    textAlign: 'center',
   },
   infoRow: {
     flexDirection: 'row',
     alignItems: 'center',
-    marginBottom: 8,
+    marginBottom: 6,
+  },
+  label: {
+    fontSize: 14,
+    color: '#374151',
+  },
+  archText: {
+    fontSize: 14,
+    color: '#2563eb',
+    fontWeight: '600',
   },
   granted: {
     color: '#16a34a',

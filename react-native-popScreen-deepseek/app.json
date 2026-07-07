@@ -18,6 +18,9 @@
       },
       "package": "com.fariakarim.reactnativepopScreendeepseek"
     },
+    "plugins": [
+      "./app.plugin.js"
+    ],
     "web": {
       "favicon": "./assets/favicon.png"
     }
