@@ -10,6 +10,7 @@ export default function App() {
   const [overlayRunning, setOverlayRunning] = useState(false);
   const [archInfo, setArchInfo] = useState('checking...');
   const [lastDragEvent, setLastDragEvent] = useState('none yet');
+  const [lastResizeEvent, setLastResizeEvent] = useState('none yet');
 
   const checkPermission = useCallback(() => {
     PopScreen?.hasOverlayPermission().then(setHasPermission);
@@ -25,16 +26,21 @@ export default function App() {
       setArchInfo('UNKNOWN (detection failed)');
     });
 
-    // Listen for drag events from the native module
-    const subscription = eventEmitter?.addListener('onDragUpdate', (event) => {
-      setLastDragEvent(JSON.stringify(event));
+    const dragSub = eventEmitter?.addListener('onDragUpdate', (e) => {
+      setLastDragEvent(JSON.stringify(e));
     });
-    return () => subscription?.remove();
+    const resizeSub = eventEmitter?.addListener('onResizeUpdate', (e) => {
+      setLastResizeEvent(JSON.stringify(e));
+    });
+    return () => {
+      dragSub?.remove();
+      resizeSub?.remove();
+    };
   }, [checkPermission]);
 
   return (
     <View style={styles.container}>
-      <Text style={styles.title}>PopScreen — Milestone 3 Verification</Text>
+      <Text style={styles.title}>PopScreen — Milestone 4 Verification</Text>
       <StatusBar style="auto" />
 
       <View style={styles.infoRow}>
@@ -59,6 +65,11 @@ export default function App() {
       <View style={styles.infoRow}>
         <Text style={styles.label}>Last drag event: </Text>
         <Text style={styles.eventText} numberOfLines={1}>{lastDragEvent}</Text>
+      </View>
+
+      <View style={styles.infoRow}>
+        <Text style={styles.label}>Last resize event: </Text>
+        <Text style={styles.eventText} numberOfLines={1}>{lastResizeEvent}</Text>
       </View>
 
       <View style={styles.buttonGroup}>
@@ -92,7 +103,7 @@ export default function App() {
       </View>
 
       <Text style={styles.hint}>
-        Drag the overlay's top strip, then check the drag event readout above.
+        Resize from the ⤡ corner. Drag from the ≡ strip. Tap Minimize in the overlay.
       </Text>
     </View>
   );

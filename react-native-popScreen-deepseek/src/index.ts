@@ -1,6 +1,6 @@
 import { PopScreenModule } from './PopScreenModule';
 import { NativeEventEmitter, NativeModules } from 'react-native';
-import { DragUpdateEvent } from './PopScreen.types';
+import { DragUpdateEvent, ResizeUpdateEvent } from './PopScreen.types';
 
 const { PopScreen } = NativeModules;
 
@@ -30,7 +30,7 @@ export async function getReactArchitectureInfo() {
   return PopScreenModule.getReactArchitectureInfo();
 }
 
-// ─── Drag event listener (Milestone 3) ───────────────────────────────
+// ─── Drag / Resize event listeners (Milestones 3-4) ──────────────────
 
 const eventEmitter = PopScreen ? new NativeEventEmitter(PopScreen) : null;
 
@@ -38,10 +38,39 @@ export function addDragUpdateListener(
   listener: (event: DragUpdateEvent) => void
 ) {
   const subscription = eventEmitter?.addListener('onDragUpdate', listener);
-  return {
-    remove: () => subscription?.remove(),
-  };
+  return { remove: () => subscription?.remove() };
 }
+
+export function addResizeUpdateListener(
+  listener: (event: ResizeUpdateEvent) => void
+) {
+  const subscription = eventEmitter?.addListener('onResizeUpdate', listener);
+  return { remove: () => subscription?.remove() };
+}
+
+// ─── Generic window rect control (Milestone 4) ───────────────────────
+
+export async function setWindowRect(
+  x?: number,
+  y?: number,
+  width?: number,
+  height?: number
+): Promise<void> {
+  return PopScreenModule.setWindowRect(x, y, width, height);
+}
+
+export async function setSizeConstraints(
+  minWidth?: number,
+  minHeight?: number,
+  maxWidth?: number,
+  maxHeight?: number
+): Promise<void> {
+  return PopScreenModule.setSizeConstraints(minWidth, minHeight, maxWidth, maxHeight);
+}
+
+// ─── Minimize / Restore (pure JS on top of setWindowRect) ────────────
+
+export { minimize, restore, getIsMinimized } from './minimizeRestore';
 
 // ─── Components & helpers ────────────────────────────────────────────
 
