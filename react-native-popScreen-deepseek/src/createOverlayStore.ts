@@ -25,4 +25,4 @@ export function createOverlayStore<T extends Record<string, any>>(initialState: 
   return { getState, setState, subscribe };
 }
 
-export type OverlayStore<T> = ReturnType<typeof createOverlayStore<T>>;
+export type OverlayStore<T extends Record<string, any>> = ReturnType<typeof createOverlayStore<T>>;

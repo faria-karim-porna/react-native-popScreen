@@ -1,7 +1,7 @@
 {
   "expo": {
-    "name": "react-native-popScreen-deepseek",
-    "slug": "react-native-popScreen-deepseek",
+    "name": "PopScreen Example",
+    "slug": "popscreen-example",
     "version": "1.0.0",
     "orientation": "portrait",
     "icon": "./assets/icon.png",

@@ -1,29 +1,101 @@
-# PopScreen Spike — Milestone 0 & 1
+# PopScreen
 
-**Milestone 0 — Spike / Validation**
-Prove that a live React Native surface can render and auto-update inside a `TYPE_APPLICATION_OVERLAY` system window with zero native involvement per update.
+**Android-only** floating overlay library for React Native (Expo). Render
+any React Native UI as a system-level floating window — like YouTube
+Picture-in-Picture or Messenger chat bubbles — on top of other apps.
 
-- `OverlayService` — foreground `Service` creating a system overlay via `WindowManager`, hosting a second React surface (`ReactHost.createSurface()`) on the New Architecture.
-- `PopScreenModule` + `PopScreenPackage` — native module exposing `hasOverlayPermission`, `requestOverlayPermission`, `startOverlay`, and `stopOverlay` to JS.
-- `OverlayRoot.js` — overlay content with a live "Tick: N" counter (proves RN re-renders flow automatically).
-- `App.js` — host app control panel with permission, start, and stop buttons.
+> **Platform:** Android only (API 26+). iOS cannot support system-wide
+> overlays from third-party apps — this is a platform constraint, not a
+> library limitation. See [docs/known-limitations.md](docs/known-limitations.md).
+>
+> **Expo Go:** not supported. A custom dev client is required.
+> See [Installation](#installation).
 
-**Milestone 1 — Expo Module Scaffolding**
-Native module renamed to `PopScreenModule` + `PopScreenPackage`. Added `getReactArchitectureInfo()` to detect New vs Old React Native architecture. Created Expo config plugin (`plugin/src/index.ts` + `app.plugin.js`) that injects overlay permissions and service declaration into `AndroidManifest.xml`. Added TypeScript types and wrappers (`src/`). Wired plugin into `app.json`. Updated `App.js` to display detected architecture info.
+## Features
 
-**Milestone 2 — Generic Overlay Window + Static Content**
-`PopScreenReactSurfaceHost` with dual-path creation (New Arch via reflection, Old Arch via `ReactRootView`). `PopScreenHostProvider` interface. `show()`/`hide()` API in `PopScreenModule`. `OverlayDemo.js`, `PopScreenContent.js`, `registerOverlaySurface.js`. Deleted `OverlayRoot.js`.
+- Render any RN component tree in a floating overlay window
+- Drag, resize, minimize, and restore the overlay — all controllable from JS
+- Cross-surface state sync between the host app and the overlay via `usePopScreen()`
+- Generic native layer — Kotlin never knows what's inside the overlay
+- Dual old/new RN architecture support (Fabric + legacy bridge)
+- Foreground service for overlay persistence while the app is backgrounded
+- Permission revocation detection and graceful teardown
 
-**Milestone 3 — Touch Interaction**
-`PopScreenTouchInterceptorView` wraps the RN surface, intercepting drag-handle touches (top 32dp strip) while passing content touches through. `OverlayService` moves the real system window via `WindowManager.updateViewLayout()` with throttled `onDragUpdate` events emitted to JS. `OverlayDemo.js` proves both touch domains with a drag handle + tappable button. `NativeEventEmitter` listens for drag events in `App.js`.
+## Installation
 
-**Milestone 4 — Resize, Minimize, Restore**
-`PopScreenTouchInterceptorView` now handles three touch regions (drag/resize/content) via `ActiveGesture` enum. `OverlayService` added `setWindowRect()` (generic JS-driven rect primitive), `resizeWindowBy()` with `coerceIn` clamping, and `setSizeConstraints()`. `src/minimizeRestore.ts` — pure JS minimize/restore on top of `setWindowRect` (no native minimize concept). `OverlayDemo.js` has ⤡ resize handle, Minimize button, and minimized 🎈 state.
+```bash
+npx expo install popscreen
+npx expo install expo-dev-client
+npx expo prebuild --platform android
+eas build --profile development --platform android
+```
 
-**Milestone 5 — State Sync & Hook API**
-`usePopScreen(key, default)` hook backed by a module-scoped external store — no Context needed, works across both RN surfaces. Two canonical demos: **Counter** (+/− buttons via shared store, values sync live between overlay and main app) and **Input Submit** (TextInput + Submit with local `useState`, proving IME-in-overlay works). `OverlaySwitcher.js` reads `activeDemo` from the shared store. `PopScreenContent` accepts `dragHandleHeight`/`resizeHandleSize` props. Deleted dead `OverlayDemo.js`. `docs/state-sync.md` documents both patterns.
+The library ships an [Expo Config Plugin](https://docs.expo.dev/config-plugins/introduction/)
+that automatically injects the required Android permissions and service
+declaration — no manual `AndroidManifest.xml` editing needed.
 
-**Milestone 6 — Lifecycle Hardening**
-Permission revocation poll (Handler every 3s) triggers graceful teardown with `onPermissionResult` + `onWindowStateChange` events. `destroy()` full teardown API. `onWindowStateChange` event (shown/hidden/destroyed). Battery optimization functions (`hasBatteryOptimizationExemption`/`requestBatteryOptimizationExemption`). `START_NOT_STICKY` ties overlay to host process. `onConfigurationChanged` recomputes DP→PX on rotation. `docs/known-limitations.md` documenting process-death, MIUI battery, and IME behavior.
+## Quick start
 
-**Next step:** Build on a POCO M3 with `npx expo run:android`, verify permission revocation detection, destroy cycle, battery exemption UX, and rotation.
+```tsx
+// index.js — register the overlay surface early
+import { registerRootComponent } from 'expo';
+import { registerOverlaySurface } from 'popscreen';
+import App from './App';
+import MyBubble from './MyBubble';
+
+registerRootComponent(App);
+registerOverlaySurface(MyBubble);
+```
+
+```tsx
+// MyBubble.tsx — the component rendered in the floating window
+import { PopScreenContent } from 'popscreen';
+export default function MyBubble() {
+  return <PopScreenContent><YourUI /></PopScreenContent>;
+}
+```
+
+```tsx
+// Anywhere in your main app
+import * as PopScreen from 'popscreen';
+await PopScreen.requestOverlayPermission();
+await PopScreen.show();
+```
+
+## API reference
+
+See [docs/api-reference.md](docs/api-reference.md) for the full API.
+
+## State sync
+
+See [docs/state-sync.md](docs/state-sync.md) for how to share state
+between your app and the floating overlay.
+
+## Play Store guidance
+
+See [docs/play-policy-guidance.md](docs/play-policy-guidance.md) if you
+are distributing your app on Google Play.
+
+## Known limitations
+
+See [docs/known-limitations.md](docs/known-limitations.md).
+
+## Milestone Progress
+
+This project was built incrementally across 8 milestones:
+
+| Milestone | Summary |
+|-----------|---------|
+| **0** | Spike — live RN surface inside a `TYPE_APPLICATION_OVERLAY` window via `WindowManager`, foreground `Service`, second React surface with auto-updating counter. |
+| **1** | Expo module scaffolding — `PopScreenModule` + `PopScreenPackage`, architecture detection, config plugin for Android permissions. |
+| **2** | Generic overlay window — `PopScreenReactSurfaceHost` dual-path (New/Old Arch), `show()`/`hide()` API, `PopScreenContent` wrapper, `registerOverlaySurface`. |
+| **3** | Touch interaction — `PopScreenTouchInterceptorView` with drag handle, `updateViewLayout()` with throttled `onDragUpdate` events to JS. |
+| **4** | Resize & minimize — three-region touch (drag/resize/content) via `ActiveGesture` enum, `setWindowRect()` generic JS-driven rect primitive, pure-JS minimize/restore. |
+| **5** | State sync & hook API — `usePopScreen(key, default)` backed by module-scoped store (no Context), Counter & Input Submit demos proving cross-surface sync vs local state. |
+| **6** | Lifecycle hardening — permission revocation poll, `destroy()` API, `onWindowStateChange` events, battery optimization functions, `START_NOT_STICKY`, `onConfigurationChanged`. |
+| **7** | Testing & docs — 19 Jest tests (createOverlayStore, usePopScreen, minimizeRestore, PopScreenContent) with native module mocks. Android JUnit + instrumented tests. GitHub Actions CI (JS tests + Android build + plugin build). Publishable README, API reference, Play policy guidance, known limitations docs, state sync docs. Demo app polish with inline JSDoc comments explaining each demo. TypeScript infrastructure (tsconfig, @types/jest, typecheck). |
+| **8** | Publication — npm publish, versioning, changelog. |
+
+## License
+
+MIT

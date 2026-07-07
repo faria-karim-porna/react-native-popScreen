@@ -3,6 +3,18 @@ import { View, Text, Pressable, StyleSheet } from 'react-native';
 import PopScreenContent from '../src/PopScreenContent';
 import { usePopScreen } from '../src/usePopScreen';
 
+/**
+ * Counter Overlay Demo
+ *
+ * WHAT THIS DEMO PROVES: Cross-surface state sync.
+ *
+ * The `count` value is stored in the shared module-scoped store via
+ * `usePopScreen('count', 0)`. The same key is read by CounterMainAppPanel
+ * (in the host app's component tree). When you press + or − here, the
+ * host app's panel updates instantly — no Context, no events, no bridge
+ * overhead. Both surfaces read/write the exact same in-memory value
+ * because they share the same JS process.
+ */
 export default function CounterOverlayContent() {
   const [count, setCount] = usePopScreen('count', 0);
 

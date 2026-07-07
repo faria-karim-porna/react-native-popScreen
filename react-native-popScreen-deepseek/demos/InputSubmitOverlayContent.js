@@ -2,6 +2,27 @@ import React, { useState } from 'react';
 import { View, Text, TextInput, Pressable, FlatList, StyleSheet } from 'react-native';
 import PopScreenContent from '../src/PopScreenContent';
 
+/**
+ * Input Submit Overlay Demo
+ *
+ * WHAT THIS DEMO PROVES: Local state in the overlay.
+ *
+ * Unlike the Counter demo, this uses plain `useState` — no
+ * `usePopScreen()` at all. It proves that ordinary React state
+ * (form drafts, submission history) works inside the overlay
+ * exactly as it does on any other screen, and does NOT leak into
+ * the shared store or the host app's component tree.
+ *
+ * This is the recommended pattern for state that only matters
+ * inside the floating bubble (form drafts, scroll position, etc.).
+ * Reserve `usePopScreen()` for state that genuinely needs to be
+ * visible in both surfaces.
+ *
+ * It also proves that TextInput with IME (soft keyboard) works
+ * inside a `FLAG_NOT_FOCUSABLE` overlay — the library temporarily
+ * clears the flag when the input receives focus, and restores it
+ * on blur.
+ */
 export default function InputSubmitOverlayContent() {
   const [draft, setDraft] = useState('');
   const [submissions, setSubmissions] = useState([]);
