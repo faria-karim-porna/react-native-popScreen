@@ -1,13 +1,15 @@
 import React, { useEffect, useState, useCallback } from 'react';
-import { View, Text, Button, StyleSheet, NativeModules } from 'react-native';
+import { View, Text, Button, StyleSheet, NativeModules, NativeEventEmitter } from 'react-native';
 import { StatusBar } from 'expo-status-bar';
 
 const { PopScreen } = NativeModules;
+const eventEmitter = PopScreen ? new NativeEventEmitter(PopScreen) : null;
 
 export default function App() {
   const [hasPermission, setHasPermission] = useState(false);
   const [overlayRunning, setOverlayRunning] = useState(false);
   const [archInfo, setArchInfo] = useState('checking...');
+  const [lastDragEvent, setLastDragEvent] = useState('none yet');
 
   const checkPermission = useCallback(() => {
     PopScreen?.hasOverlayPermission().then(setHasPermission);
@@ -22,11 +24,17 @@ export default function App() {
     }).catch(() => {
       setArchInfo('UNKNOWN (detection failed)');
     });
+
+    // Listen for drag events from the native module
+    const subscription = eventEmitter?.addListener('onDragUpdate', (event) => {
+      setLastDragEvent(JSON.stringify(event));
+    });
+    return () => subscription?.remove();
   }, [checkPermission]);
 
   return (
     <View style={styles.container}>
-      <Text style={styles.title}>PopScreen — Milestone 2 Verification</Text>
+      <Text style={styles.title}>PopScreen — Milestone 3 Verification</Text>
       <StatusBar style="auto" />
 
       <View style={styles.infoRow}>
@@ -46,6 +54,11 @@ export default function App() {
         <Text style={overlayRunning ? styles.granted : styles.denied}>
           {String(overlayRunning)}
         </Text>
+      </View>
+
+      <View style={styles.infoRow}>
+        <Text style={styles.label}>Last drag event: </Text>
+        <Text style={styles.eventText} numberOfLines={1}>{lastDragEvent}</Text>
       </View>
 
       <View style={styles.buttonGroup}>
@@ -79,7 +92,7 @@ export default function App() {
       </View>
 
       <Text style={styles.hint}>
-        Press Show, then go to home screen. Look for the floating overlay!
+        Drag the overlay's top strip, then check the drag event readout above.
       </Text>
     </View>
   );
@@ -103,6 +116,7 @@ const styles = StyleSheet.create({
     flexDirection: 'row',
     alignItems: 'center',
     marginBottom: 6,
+    flexWrap: 'wrap',
   },
   label: {
     fontSize: 14,
@@ -112,6 +126,12 @@ const styles = StyleSheet.create({
     fontSize: 14,
     color: '#2563eb',
     fontWeight: '600',
+  },
+  eventText: {
+    fontSize: 13,
+    color: '#7c3aed',
+    fontWeight: '500',
+    maxWidth: 200,
   },
   granted: {
     color: '#16a34a',

@@ -5,3 +5,11 @@ export type ReactArchitectureInfo = {
   isNewArchitecture: boolean;
   reactNativeVersion: string | null;
 };
+
+export type DragUpdatePhase = 'start' | 'move' | 'end';
+
+export type DragUpdateEvent = {
+  phase: DragUpdatePhase;
+  x?: number;
+  y?: number;
+};

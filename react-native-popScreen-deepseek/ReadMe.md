@@ -14,4 +14,7 @@ Native module renamed to `PopScreenModule` + `PopScreenPackage`. Added `getReact
 **Milestone 2 — Generic Overlay Window + Static Content**
 `PopScreenReactSurfaceHost` with dual-path creation (New Arch via reflection, Old Arch via `ReactRootView`). `PopScreenHostProvider` interface. `show()`/`hide()` API in `PopScreenModule`. `OverlayDemo.js`, `PopScreenContent.js`, `registerOverlaySurface.js`. Deleted `OverlayRoot.js`.
 
-**Next step:** Build and run on a POCO M3 with `npx expo run:android`, verify the overlay window renders "🎈 Hello from the overlay!" content, and confirm Show→Hide→Show works cleanly.
+**Milestone 3 — Touch Interaction**
+`PopScreenTouchInterceptorView` wraps the RN surface, intercepting drag-handle touches (top 32dp strip) while passing content touches through. `OverlayService` moves the real system window via `WindowManager.updateViewLayout()` with throttled `onDragUpdate` events emitted to JS. `OverlayDemo.js` proves both touch domains with a drag handle + tappable button. `NativeEventEmitter` listens for drag events in `App.js`.
+
+**Next step:** Build on a POCO M3 with `npx expo run:android`, verify the overlay drags from the handle and button taps work correctly.
