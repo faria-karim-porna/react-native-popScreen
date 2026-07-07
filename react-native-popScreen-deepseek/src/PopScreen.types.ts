@@ -23,3 +23,15 @@ export type ResizeUpdateEvent = {
   width?: number;
   height?: number;
 };
+
+export type WindowState = 'shown' | 'hidden' | 'destroyed';
+
+export type WindowStateChangeEvent = {
+  state: WindowState;
+  reason?: 'permission_revoked' | 'not_granted' | string;
+};
+
+export type PermissionResultEvent = {
+  granted: boolean;
+  reason?: string;
+};

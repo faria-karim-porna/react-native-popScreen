@@ -23,4 +23,7 @@ Native module renamed to `PopScreenModule` + `PopScreenPackage`. Added `getReact
 **Milestone 5 — State Sync & Hook API**
 `usePopScreen(key, default)` hook backed by a module-scoped external store — no Context needed, works across both RN surfaces. Two canonical demos: **Counter** (+/− buttons via shared store, values sync live between overlay and main app) and **Input Submit** (TextInput + Submit with local `useState`, proving IME-in-overlay works). `OverlaySwitcher.js` reads `activeDemo` from the shared store. `PopScreenContent` accepts `dragHandleHeight`/`resizeHandleSize` props. Deleted dead `OverlayDemo.js`. `docs/state-sync.md` documents both patterns.
 
-**Next step:** Build on a POCO M3 with `npx expo run:android`, verify counter cross-surface sync and TextInput IME behavior.
+**Milestone 6 — Lifecycle Hardening**
+Permission revocation poll (Handler every 3s) triggers graceful teardown with `onPermissionResult` + `onWindowStateChange` events. `destroy()` full teardown API. `onWindowStateChange` event (shown/hidden/destroyed). Battery optimization functions (`hasBatteryOptimizationExemption`/`requestBatteryOptimizationExemption`). `START_NOT_STICKY` ties overlay to host process. `onConfigurationChanged` recomputes DP→PX on rotation. `docs/known-limitations.md` documenting process-death, MIUI battery, and IME behavior.
+
+**Next step:** Build on a POCO M3 with `npx expo run:android`, verify permission revocation detection, destroy cycle, battery exemption UX, and rotation.

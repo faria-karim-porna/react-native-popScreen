@@ -1,6 +1,6 @@
 import { PopScreenModule } from './PopScreenModule';
 import { NativeEventEmitter, NativeModules } from 'react-native';
-import { DragUpdateEvent, ResizeUpdateEvent } from './PopScreen.types';
+import { DragUpdateEvent, ResizeUpdateEvent, WindowStateChangeEvent, PermissionResultEvent } from './PopScreen.types';
 
 const { PopScreen } = NativeModules;
 
@@ -14,6 +14,16 @@ export async function requestOverlayPermission(): Promise<void> {
   return PopScreenModule.requestOverlayPermission();
 }
 
+// ─── Battery optimization (Milestone 6) ──────────────────────────────
+
+export async function hasBatteryOptimizationExemption(): Promise<boolean> {
+  return PopScreenModule.hasBatteryOptimizationExemption();
+}
+
+export async function requestBatteryOptimizationExemption(): Promise<void> {
+  return PopScreenModule.requestBatteryOptimizationExemption();
+}
+
 // ─── Overlay lifecycle ───────────────────────────────────────────────
 
 export async function show(): Promise<void> {
@@ -22,6 +32,10 @@ export async function show(): Promise<void> {
 
 export async function hide(): Promise<void> {
   return PopScreenModule.hide();
+}
+
+export async function destroy(): Promise<void> {
+  return PopScreenModule.destroy();
 }
 
 // ─── Architecture detection ──────────────────────────────────────────
@@ -48,6 +62,22 @@ export function addResizeUpdateListener(
   return { remove: () => subscription?.remove() };
 }
 
+// ─── Lifecycle event listeners (Milestone 6) ─────────────────────────
+
+export function addWindowStateChangeListener(
+  listener: (event: WindowStateChangeEvent) => void
+) {
+  const subscription = eventEmitter?.addListener('onWindowStateChange', listener);
+  return { remove: () => subscription?.remove() };
+}
+
+export function addPermissionResultListener(
+  listener: (event: PermissionResultEvent) => void
+) {
+  const subscription = eventEmitter?.addListener('onPermissionResult', listener);
+  return { remove: () => subscription?.remove() };
+}
+
 // ─── Generic window rect control (Milestone 4) ───────────────────────
 
 export async function setWindowRect(
@@ -68,7 +98,7 @@ export async function setSizeConstraints(
   return PopScreenModule.setSizeConstraints(minWidth, minHeight, maxWidth, maxHeight);
 }
 
-// ─── Minimize / Restore (pure JS on top of setWindowRect) ────────────
+// ─── Minimize / Restore ──────────────────────────────────────────────
 
 export { minimize, restore, getIsMinimized } from './minimizeRestore';
 
@@ -77,7 +107,7 @@ export { minimize, restore, getIsMinimized } from './minimizeRestore';
 export { default as PopScreenContent } from './PopScreenContent';
 export { registerOverlaySurface } from './registerOverlaySurface';
 
-// ─── Shared store hook (Milestone 5) ─────────────────────────────────
+// ─── Shared store hook ───────────────────────────────────────────────
 
 export { usePopScreen, getPopScreenState } from './usePopScreen';
 
