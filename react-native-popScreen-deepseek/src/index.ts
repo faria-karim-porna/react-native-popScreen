@@ -77,6 +77,10 @@ export { minimize, restore, getIsMinimized } from './minimizeRestore';
 export { default as PopScreenContent } from './PopScreenContent';
 export { registerOverlaySurface } from './registerOverlaySurface';
 
+// ─── Shared store hook (Milestone 5) ─────────────────────────────────
+
+export { usePopScreen, getPopScreenState } from './usePopScreen';
+
 // ─── Re-export types ─────────────────────────────────────────────────
 
 export * from './PopScreen.types';

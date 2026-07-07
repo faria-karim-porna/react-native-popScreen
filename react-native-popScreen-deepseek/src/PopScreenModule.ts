@@ -11,6 +11,7 @@ export interface PopScreenNativeModule {
   getReactArchitectureInfo(): Promise<ReactArchitectureInfo>;
   setWindowRect(x?: number, y?: number, width?: number, height?: number): Promise<void>;
   setSizeConstraints(minWidth?: number, minHeight?: number, maxWidth?: number, maxHeight?: number): Promise<void>;
+  setHandleDimensions(dragHandleHeightDp?: number, resizeHandleSizeDp?: number): Promise<void>;
 }
 
 /**
@@ -29,4 +30,5 @@ export const PopScreenModule: PopScreenNativeModule = PopScreen ?? {
   }),
   setWindowRect: async () => {},
   setSizeConstraints: async () => {},
+  setHandleDimensions: async () => {},
 };

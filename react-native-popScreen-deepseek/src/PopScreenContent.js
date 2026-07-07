@@ -1,17 +1,29 @@
-import React from 'react';
+import React, { useEffect } from 'react';
+import { NativeModules } from 'react-native';
+
+const { PopScreen } = NativeModules;
 
 type PopScreenContentProps = {
   children: React.ReactNode;
+  dragHandleHeight?: number;
+  resizeHandleSize?: number;
 };
 
 /**
  * Wraps whatever arbitrary RN content the developer wants shown in the
- * floating overlay. This component itself does nothing clever — its
- * importance is purely structural: it's the component registered as the
- * root of the "PopScreenOverlay" surface, separating the developer's
- * overlay UI from the main app's UI by registration, not by any special
- * native awareness of this component's existence.
+ * floating overlay. Also accepts optional config props that propagate
+ * to the native interceptor's touch regions.
  */
-export default function PopScreenContent({ children }: PopScreenContentProps) {
+export default function PopScreenContent({
+  children,
+  dragHandleHeight,
+  resizeHandleSize,
+}: PopScreenContentProps) {
+  useEffect(() => {
+    if (dragHandleHeight !== undefined || resizeHandleSize !== undefined) {
+      PopScreen?.setHandleDimensions(dragHandleHeight, resizeHandleSize);
+    }
+  }, [dragHandleHeight, resizeHandleSize]);
+
   return <>{children}</>;
 }

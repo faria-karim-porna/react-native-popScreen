@@ -1,16 +1,16 @@
 import React, { useEffect, useState, useCallback } from 'react';
-import { View, Text, Button, StyleSheet, NativeModules, NativeEventEmitter } from 'react-native';
+import { View, Text, Button, StyleSheet, NativeModules } from 'react-native';
 import { StatusBar } from 'expo-status-bar';
+import { usePopScreen } from './src/usePopScreen';
+import CounterMainAppPanel from './demos/CounterMainAppPanel';
 
 const { PopScreen } = NativeModules;
-const eventEmitter = PopScreen ? new NativeEventEmitter(PopScreen) : null;
 
 export default function App() {
   const [hasPermission, setHasPermission] = useState(false);
   const [overlayRunning, setOverlayRunning] = useState(false);
   const [archInfo, setArchInfo] = useState('checking...');
-  const [lastDragEvent, setLastDragEvent] = useState('none yet');
-  const [lastResizeEvent, setLastResizeEvent] = useState('none yet');
+  const [activeDemo, setActiveDemo] = usePopScreen('activeDemo', 'counter');
 
   const checkPermission = useCallback(() => {
     PopScreen?.hasOverlayPermission().then(setHasPermission);
@@ -25,22 +25,11 @@ export default function App() {
     }).catch(() => {
       setArchInfo('UNKNOWN (detection failed)');
     });
-
-    const dragSub = eventEmitter?.addListener('onDragUpdate', (e) => {
-      setLastDragEvent(JSON.stringify(e));
-    });
-    const resizeSub = eventEmitter?.addListener('onResizeUpdate', (e) => {
-      setLastResizeEvent(JSON.stringify(e));
-    });
-    return () => {
-      dragSub?.remove();
-      resizeSub?.remove();
-    };
   }, [checkPermission]);
 
   return (
     <View style={styles.container}>
-      <Text style={styles.title}>PopScreen — Milestone 4 Verification</Text>
+      <Text style={styles.title}>PopScreen — Milestone 5 Verification</Text>
       <StatusBar style="auto" />
 
       <View style={styles.infoRow}>
@@ -55,22 +44,14 @@ export default function App() {
         <Text style={styles.archText}>{archInfo}</Text>
       </View>
 
-      <View style={styles.infoRow}>
-        <Text style={styles.label}>Overlay running: </Text>
-        <Text style={overlayRunning ? styles.granted : styles.denied}>
-          {String(overlayRunning)}
-        </Text>
+      <Text style={styles.sectionTitle}>Demo Switcher</Text>
+      <View style={styles.demoSwitch}>
+        <Button title="Counter" onPress={() => setActiveDemo('counter')} />
+        <Button title="Input Submit" onPress={() => setActiveDemo('inputSubmit')} />
       </View>
+      <Text style={styles.demoLabel}>Active: {activeDemo}</Text>
 
-      <View style={styles.infoRow}>
-        <Text style={styles.label}>Last drag event: </Text>
-        <Text style={styles.eventText} numberOfLines={1}>{lastDragEvent}</Text>
-      </View>
-
-      <View style={styles.infoRow}>
-        <Text style={styles.label}>Last resize event: </Text>
-        <Text style={styles.eventText} numberOfLines={1}>{lastResizeEvent}</Text>
-      </View>
+      {activeDemo === 'counter' && <CounterMainAppPanel />}
 
       <View style={styles.buttonGroup}>
         <Button
@@ -103,7 +84,7 @@ export default function App() {
       </View>
 
       <Text style={styles.hint}>
-        Resize from the ⤡ corner. Drag from the ≡ strip. Tap Minimize in the overlay.
+        Switch demos, then Show Overlay. Counter syncs between overlay and this screen.
       </Text>
     </View>
   );
@@ -120,14 +101,13 @@ const styles = StyleSheet.create({
   title: {
     fontSize: 16,
     fontWeight: 'bold',
-    marginBottom: 20,
+    marginBottom: 12,
     textAlign: 'center',
   },
   infoRow: {
     flexDirection: 'row',
     alignItems: 'center',
     marginBottom: 6,
-    flexWrap: 'wrap',
   },
   label: {
     fontSize: 14,
@@ -138,11 +118,22 @@ const styles = StyleSheet.create({
     color: '#2563eb',
     fontWeight: '600',
   },
-  eventText: {
-    fontSize: 13,
-    color: '#7c3aed',
-    fontWeight: '500',
-    maxWidth: 200,
+  sectionTitle: {
+    fontSize: 14,
+    fontWeight: '600',
+    color: '#374151',
+    marginTop: 12,
+    marginBottom: 4,
+  },
+  demoSwitch: {
+    flexDirection: 'row',
+    gap: 10,
+    marginBottom: 4,
+  },
+  demoLabel: {
+    fontSize: 12,
+    color: '#6b7280',
+    marginBottom: 8,
   },
   granted: {
     color: '#16a34a',
@@ -153,7 +144,7 @@ const styles = StyleSheet.create({
     fontWeight: 'bold',
   },
   buttonGroup: {
-    marginTop: 16,
+    marginTop: 12,
     width: '100%',
     maxWidth: 280,
   },
@@ -161,7 +152,7 @@ const styles = StyleSheet.create({
     height: 8,
   },
   hint: {
-    marginTop: 24,
+    marginTop: 16,
     fontSize: 12,
     color: '#6b7280',
     textAlign: 'center',

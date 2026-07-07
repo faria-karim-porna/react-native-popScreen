@@ -20,4 +20,7 @@ Native module renamed to `PopScreenModule` + `PopScreenPackage`. Added `getReact
 **Milestone 4 — Resize, Minimize, Restore**
 `PopScreenTouchInterceptorView` now handles three touch regions (drag/resize/content) via `ActiveGesture` enum. `OverlayService` added `setWindowRect()` (generic JS-driven rect primitive), `resizeWindowBy()` with `coerceIn` clamping, and `setSizeConstraints()`. `src/minimizeRestore.ts` — pure JS minimize/restore on top of `setWindowRect` (no native minimize concept). `OverlayDemo.js` has ⤡ resize handle, Minimize button, and minimized 🎈 state.
 
-**Next step:** Build on a POCO M3 with `npx expo run:android`, verify resize, drag, button taps, and minimize/restore cycles work correctly.
+**Milestone 5 — State Sync & Hook API**
+`usePopScreen(key, default)` hook backed by a module-scoped external store — no Context needed, works across both RN surfaces. Two canonical demos: **Counter** (+/− buttons via shared store, values sync live between overlay and main app) and **Input Submit** (TextInput + Submit with local `useState`, proving IME-in-overlay works). `OverlaySwitcher.js` reads `activeDemo` from the shared store. `PopScreenContent` accepts `dragHandleHeight`/`resizeHandleSize` props. Deleted dead `OverlayDemo.js`. `docs/state-sync.md` documents both patterns.
+
+**Next step:** Build on a POCO M3 with `npx expo run:android`, verify counter cross-surface sync and TextInput IME behavior.
