@@ -1,11 +1,11 @@
 import { registerRootComponent } from 'expo';
-import { AppRegistry } from 'react-native';
 import App from './App';
-import OverlayRoot from './OverlayRoot';
+import OverlayDemo from './OverlayDemo';
+import { registerOverlaySurface } from './src/registerOverlaySurface';
 
 // Normal app registration (unchanged)
 registerRootComponent(App);
 
-// Second surface — this is what the OverlayService attaches to the
+// Second surface — this is what OverlayService attaches to the
 // system overlay window. Name must match OverlayService.SURFACE_NAME.
-AppRegistry.registerComponent('PopScreenSpikeOverlay', () => OverlayRoot);
+registerOverlaySurface(OverlayDemo);

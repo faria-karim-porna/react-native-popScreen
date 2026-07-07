@@ -11,4 +11,7 @@ Prove that a live React Native surface can render and auto-update inside a `TYPE
 **Milestone 1 — Expo Module Scaffolding**
 Native module renamed to `PopScreenModule` + `PopScreenPackage`. Added `getReactArchitectureInfo()` to detect New vs Old React Native architecture. Created Expo config plugin (`plugin/src/index.ts` + `app.plugin.js`) that injects overlay permissions and service declaration into `AndroidManifest.xml`. Added TypeScript types and wrappers (`src/`). Wired plugin into `app.json`. Updated `App.js` to display detected architecture info.
 
-**Next step:** Build and run on a POCO M3 with `npx expo run:android`, verify architecture detection shows `NEW_ARCHITECTURE`, and confirm permission round-trip works end-to-end.
+**Milestone 2 — Generic Overlay Window + Static Content**
+`PopScreenReactSurfaceHost` with dual-path creation (New Arch via reflection, Old Arch via `ReactRootView`). `PopScreenHostProvider` interface. `show()`/`hide()` API in `PopScreenModule`. `OverlayDemo.js`, `PopScreenContent.js`, `registerOverlaySurface.js`. Deleted `OverlayRoot.js`.
+
+**Next step:** Build and run on a POCO M3 with `npx expo run:android`, verify the overlay window renders "🎈 Hello from the overlay!" content, and confirm Show→Hide→Show works cleanly.

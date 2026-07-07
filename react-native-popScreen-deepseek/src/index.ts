@@ -10,14 +10,14 @@ export async function requestOverlayPermission(): Promise<void> {
   return PopScreenModule.requestOverlayPermission();
 }
 
-// ─── Overlay lifecycle (Milestone 0 spike) ───────────────────────────
+// ─── Overlay lifecycle (Milestone 2 canonical API) ───────────────────
 
-export async function startOverlay(): Promise<void> {
-  return PopScreenModule.startOverlay();
+export async function show(): Promise<void> {
+  return PopScreenModule.show();
 }
 
-export async function stopOverlay(): Promise<void> {
-  return PopScreenModule.stopOverlay();
+export async function hide(): Promise<void> {
+  return PopScreenModule.hide();
 }
 
 // ─── Architecture detection (Milestone 1) ────────────────────────────
@@ -25,6 +25,11 @@ export async function stopOverlay(): Promise<void> {
 export async function getReactArchitectureInfo() {
   return PopScreenModule.getReactArchitectureInfo();
 }
+
+// ─── Components & helpers ────────────────────────────────────────────
+
+export { default as PopScreenContent } from './PopScreenContent';
+export { registerOverlaySurface } from './registerOverlaySurface';
 
 // ─── Re-export types ─────────────────────────────────────────────────
 

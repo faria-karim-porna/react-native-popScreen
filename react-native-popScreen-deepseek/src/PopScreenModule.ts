@@ -6,8 +6,8 @@ const { PopScreen } = NativeModules;
 export interface PopScreenNativeModule {
   hasOverlayPermission(): Promise<boolean>;
   requestOverlayPermission(): Promise<void>;
-  startOverlay(): Promise<void>;
-  stopOverlay(): Promise<void>;
+  show(): Promise<void>;
+  hide(): Promise<void>;
   getReactArchitectureInfo(): Promise<ReactArchitectureInfo>;
 }
 
@@ -18,8 +18,8 @@ export interface PopScreenNativeModule {
 export const PopScreenModule: PopScreenNativeModule = PopScreen ?? {
   hasOverlayPermission: async () => false,
   requestOverlayPermission: async () => {},
-  startOverlay: async () => {},
-  stopOverlay: async () => {},
+  show: async () => {},
+  hide: async () => {},
   getReactArchitectureInfo: async () => ({
     architecture: 'UNKNOWN' as const,
     isNewArchitecture: false,

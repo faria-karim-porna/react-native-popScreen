@@ -15,7 +15,6 @@ export default function App() {
 
   useEffect(() => {
     checkPermission();
-    // Also detect the RN architecture this app is running on
     PopScreen?.getReactArchitectureInfo().then((info) => {
       setArchInfo(
         `${info.architecture}${info.isNewArchitecture ? ' (New Arch)' : ' (Old Arch)'}`
@@ -27,7 +26,7 @@ export default function App() {
 
   return (
     <View style={styles.container}>
-      <Text style={styles.title}>PopScreen — Milestone 1 Verification</Text>
+      <Text style={styles.title}>PopScreen — Milestone 2 Verification</Text>
       <StatusBar style="auto" />
 
       <View style={styles.infoRow}>
@@ -61,26 +60,26 @@ export default function App() {
         />
         <View style={styles.spacer} />
         <Button
-          title="Start Overlay"
+          title="Show Overlay"
           disabled={!hasPermission}
           onPress={() => {
             setOverlayRunning(true);
-            PopScreen?.startOverlay();
+            PopScreen?.show();
           }}
         />
         <View style={styles.spacer} />
         <Button
-          title="Stop Overlay"
+          title="Hide Overlay"
           disabled={!overlayRunning}
           onPress={() => {
             setOverlayRunning(false);
-            PopScreen?.stopOverlay();
+            PopScreen?.hide();
           }}
         />
       </View>
 
       <Text style={styles.hint}>
-        Press Start, then go to home screen. Look for the floating overlay!
+        Press Show, then go to home screen. Look for the floating overlay!
       </Text>
     </View>
   );
