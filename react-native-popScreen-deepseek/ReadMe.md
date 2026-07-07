@@ -17,4 +17,7 @@ Native module renamed to `PopScreenModule` + `PopScreenPackage`. Added `getReact
 **Milestone 3 — Touch Interaction**
 `PopScreenTouchInterceptorView` wraps the RN surface, intercepting drag-handle touches (top 32dp strip) while passing content touches through. `OverlayService` moves the real system window via `WindowManager.updateViewLayout()` with throttled `onDragUpdate` events emitted to JS. `OverlayDemo.js` proves both touch domains with a drag handle + tappable button. `NativeEventEmitter` listens for drag events in `App.js`.
 
-**Next step:** Build on a POCO M3 with `npx expo run:android`, verify the overlay drags from the handle and button taps work correctly.
+**Milestone 4 — Resize, Minimize, Restore**
+`PopScreenTouchInterceptorView` now handles three touch regions (drag/resize/content) via `ActiveGesture` enum. `OverlayService` added `setWindowRect()` (generic JS-driven rect primitive), `resizeWindowBy()` with `coerceIn` clamping, and `setSizeConstraints()`. `src/minimizeRestore.ts` — pure JS minimize/restore on top of `setWindowRect` (no native minimize concept). `OverlayDemo.js` has ⤡ resize handle, Minimize button, and minimized 🎈 state.
+
+**Next step:** Build on a POCO M3 with `npx expo run:android`, verify resize, drag, button taps, and minimize/restore cycles work correctly.
