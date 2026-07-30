@@ -38,3 +38,39 @@ of other apps.
 - **Native module mocks**: required for Jest — `src/__mocks__/PopScreenModule.ts` + `expo-modules-core.ts`
 - **CI**: GitHub Actions runs JS tests + plugin build + Android build check
 - **Jest config** lives in `package.json`; uses `babel-jest` with `babel-preset-expo`; transforms react-native packages
+
+## EAS Build (APK)
+
+Build an Android APK for testing/demoing the library via EAS Build.
+
+### Prerequisites (run first)
+- Ensure EAS CLI is installed: `npm install -g eas-cli`
+- Install project deps: `npm install`
+- Build library source: `npm run build` (compiles `src/` → `build/`)
+- Build config plugin: `npm run build:plugin` (compiles `plugin/src/` → `plugin/build/`)
+- Generate native android dir (skip if it exists): `npx expo prebuild --platform android`
+
+### Build steps (execute in order)
+1. **Login to Expo**: `eas login`2. **Configure EAS Build**: `eas build:configure` → select **android** when prompted
+   (This auto-generates `eas.json` with default profiles.)
+
+3. **Edit `eas.json`** — add/replace the `production` profile with APK buildType:
+
+   ```json
+   {
+     "build": {
+       "production": {
+         "android": {
+           "buildType": "apk"
+         }
+       }
+     }
+   }
+   ```
+
+4. **Run the build**: `eas build --platform android --profile production`
+
+### Notes
+- The `android/` directory must exist before running `eas build:configure` — run `npx expo prebuild --platform android` first if missing
+- Uses the `popscreen-example` Expo app defined in `app.json`
+- The produced APK can be installed directly on an Android device (API 26+)
