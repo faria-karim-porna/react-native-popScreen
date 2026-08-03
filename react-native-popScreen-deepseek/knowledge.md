@@ -38,6 +38,7 @@ of other apps.
 - **Native module mocks**: required for Jest — `src/__mocks__/PopScreenModule.ts` + `expo-modules-core.ts`
 - **CI**: GitHub Actions runs JS tests + plugin build + Android build check
 - **Jest config** lives in `package.json`; uses `babel-jest` with `babel-preset-expo`; transforms react-native packages
+- **Known issue workaround**: `scripts/patch-autolinking.js` runs as `postinstall` and patches `expo-modules-autolinking@2.0.x` (Expo SDK 52) so its `react-native-config` command emits clean JSON instead of ANSI-colored `util.inspect` output — otherwise RNGP fails with "Could not parse autolinking config file" (see `docs/faq.md` §4). Idempotent; newer autolinking versions are skipped.
 
 ## EAS Build (APK)
 

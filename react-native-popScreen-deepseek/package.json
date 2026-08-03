@@ -15,6 +15,7 @@
     "build": "tsc --project tsconfig.build.json",
     "build:plugin": "cd plugin && npx tsc",
     "clean": "node -e \"require('fs').rmSync('build', {recursive: true, force: true})\"",
+    "postinstall": "node scripts/patch-autolinking.js",
     "test": "jest",
     "test:ci": "jest --ci --coverage",
     "prepare": "npm run build && npm run build:plugin",

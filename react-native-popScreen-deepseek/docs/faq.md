@@ -121,3 +121,32 @@ cd android
 ./gradlew assembleDebug
 adb install app/build/outputs/apk/debug/app-debug.apk
 ```
+
+---
+
+## 4. EAS build fails with "Could not parse autolinking config file: autolinking.json"
+
+**Symptom:** `eas build --platform android` (and local `gradlew` builds) fail during `:app:generateAutolinkingPackageList` with:
+
+```
+RNGP - Autolinking: Could not parse autolinking config file:
+.../android/build/generated/autolinking/autolinking.json
+The file is either missing or not containing valid JSON so the build won't succeed.
+```
+
+**Root cause:** Expo SDK 52 pins `expo-modules-autolinking@2.0.8` (the last 2.0.x release), whose `react-native-config` command prints its output with `util.inspect(results, false, null, true)` — the `colors = true` argument **forces ANSI color codes** into the output. The prebuild-generated `android/settings.gradle` pipes that output straight into `autolinking.json`, so the file is filled with escape sequences (`\u001b[32m`) that React Native's Gradle plugin (RNGP) cannot parse as JSON. The upstream fix ([expo/expo#43915](https://github.com/expo/expo/pull/43915)) only landed for newer SDKs.
+
+**Fix (already in this repo):** a `postinstall` script (`scripts/patch-autolinking.js`) patches `node_modules/expo-modules-autolinking/build/index.js` on every `npm install`/`npm ci` to emit `JSON.stringify` instead of the colored dump. Because it runs as an npm lifecycle script, it is applied automatically on EAS Build servers too.
+
+To rebuild after pulling the fix:
+
+```bash
+# make sure node_modules gets the patch applied
+npm install
+# then rebuild (or just re-run EAS with the pushed changes)
+eas build --platform android --profile production
+```
+
+Notes:
+- The patch is idempotent and only touches `expo-modules-autolinking@2.0.x`; newer versions are left untouched.
+- When PopScreen is installed as a dependency of another project, the script finds no local `expo-modules-autolinking` and safely does nothing (the consumer's own `expo-modules-autolinking` handles its builds).
