@@ -19,7 +19,16 @@
       "package": "com.fariakarim.reactnativepopScreendeepseek"
     },
     "plugins": [
-      "./app.plugin.js"
+      "./app.plugin.js",
+      [
+        "expo-build-properties",
+        {
+          "android": {
+            "minSdkVersion": 24,
+            "kotlinVersion": "1.9.25"
+          }
+        }
+      ]
     ],
     "web": {
       "favicon": "./assets/favicon.png"
