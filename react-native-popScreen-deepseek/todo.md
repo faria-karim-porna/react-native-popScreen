@@ -1,3 +1,3 @@
 Email: myselffariakarimporna@gmail.com
-Download Link: https://expo.dev/artifacts/eas/atS06A_Ov68gfHG5nzB4FgCFPM_TWFNWJIO-EnmtezU.apk
-Status: Fix Expo Build
+Download Link: https://expo.dev/artifacts/eas/LybxwBez8srlkEszeZPUTzQz7n5dIffwfLdsq0vda34.apk
+Status: Fix App Crash
