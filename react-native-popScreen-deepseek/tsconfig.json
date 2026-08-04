@@ -6,7 +6,7 @@
     "moduleResolution": "bundler",
     "allowImportingTsExtensions": true,
     "noEmit": true,
-    "types": ["jest"]
+    "types": ["jest", "node"]
   },
   "include": ["**/*.ts", "**/*.tsx", "*.js", "*.tsx"],
   "exclude": ["node_modules", "android", "ios"]

@@ -17,7 +17,7 @@ of other apps.
 ## Architecture
 - **Source**: `src/` — TypeScript/JS source files, Expo Module API
 - **Build output**: `build/` — compiled JS + declarations, what gets published
-- **Native Android**: generated into `android/` via `expo prebuild`
+- **Native Android**: Kotlin sources live as templates in `plugin/native/` (`PopScreenModule.kt`, `OverlayService.kt`, `PopScreenPackage.kt`) and are injected into `android/app/src/main/java/` by the config plugin (`withDangerousMod`) during `expo prebuild` — this survives EAS builds, which regenerate `android/` from scratch. The plugin also patches `MainApplication.kt` to register `PopScreenPackage` (legacy bridge module, name `PopScreen`)
 - **Config plugin**: `plugin/src/index.ts` (compiled to `plugin/build/`), auto-injects Android manifest entries
 - **Mocks**: `src/__mocks__/` — native module mock (`PopScreenModule.ts`) and expo-modules-core mock
 - **Demos**: `demos/` — Counter (cross-surface state sync) and Input Submit (local state) demos
