@@ -4,7 +4,7 @@ import CounterOverlayContent from './demos/CounterOverlayContent';
 import InputSubmitOverlayContent from './demos/InputSubmitOverlayContent';
 
 export default function OverlaySwitcher() {
-  const [activeDemo] = usePopScreen('activeDemo', 'counter');
+  const [activeDemo] = usePopScreen<string>('activeDemo', 'counter');
 
   if (activeDemo === 'inputSubmit') {
     return <InputSubmitOverlayContent />;

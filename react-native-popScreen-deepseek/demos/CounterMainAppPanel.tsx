@@ -3,7 +3,7 @@ import { View, Text, StyleSheet } from 'react-native';
 import { usePopScreen } from '../src/usePopScreen';
 
 export default function CounterMainAppPanel() {
-  const [count] = usePopScreen('count', 0);
+  const [count] = usePopScreen<number>('count', 0);
 
   return (
     <View style={styles.panel}>

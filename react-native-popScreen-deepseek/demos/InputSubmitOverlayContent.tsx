@@ -25,7 +25,7 @@ import PopScreenContent from '../src/PopScreenContent';
  */
 export default function InputSubmitOverlayContent() {
   const [draft, setDraft] = useState('');
-  const [submissions, setSubmissions] = useState([]);
+  const [submissions, setSubmissions] = useState<string[]>([]);
 
   const handleSubmit = () => {
     const trimmed = draft.trim();

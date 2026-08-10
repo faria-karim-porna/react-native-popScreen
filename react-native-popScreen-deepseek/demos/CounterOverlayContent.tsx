@@ -16,7 +16,7 @@ import { usePopScreen } from '../src/usePopScreen';
  * because they share the same JS process.
  */
 export default function CounterOverlayContent() {
-  const [count, setCount] = usePopScreen('count', 0);
+  const [count, setCount] = usePopScreen<number>('count', 0);
 
   return (
     <PopScreenContent>
