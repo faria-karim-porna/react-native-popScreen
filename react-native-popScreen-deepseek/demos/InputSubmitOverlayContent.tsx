@@ -20,8 +20,8 @@ import PopScreenContent from '../src/PopScreenContent';
  *
  * It also proves that TextInput with IME (soft keyboard) works
  * inside a `FLAG_NOT_FOCUSABLE` overlay — the library temporarily
- * clears the flag when the input receives focus, and restores it
- * on blur.
+ * clears the flag when a text field is tapped, and restores it as
+ * soon as the soft keyboard is dismissed.
  */
 export default function InputSubmitOverlayContent() {
   const [draft, setDraft] = useState('');

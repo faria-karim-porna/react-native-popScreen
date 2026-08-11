@@ -3,6 +3,7 @@ import { View, Text, Button, StyleSheet, NativeModules, NativeEventEmitter } fro
 import { StatusBar } from 'expo-status-bar';
 import { usePopScreen } from './src/usePopScreen';
 import CounterMainAppPanel from './demos/CounterMainAppPanel';
+import TodoMainAppPanel from './demos/TodoMainAppPanel';
 
 const { PopScreen } = NativeModules;
 const eventEmitter = PopScreen ? new NativeEventEmitter(PopScreen) : null;
@@ -49,10 +50,12 @@ export default function App() {
       <View style={styles.demoSwitch}>
         <Button title="Counter Demo" onPress={() => setActiveDemo('counter')} />
         <Button title="Input Submit Demo" onPress={() => setActiveDemo('inputSubmit')} />
+        <Button title="Todo Demo" onPress={() => setActiveDemo('todo')} />
       </View>
       <Text style={styles.demoLabel}>Active: {activeDemo}</Text>
 
       {activeDemo === 'counter' && <CounterMainAppPanel />}
+      {activeDemo === 'todo' && <TodoMainAppPanel />}
 
       <View style={styles.buttonGroup}>
         <Button title="Show Overlay" disabled={!hasPermission}

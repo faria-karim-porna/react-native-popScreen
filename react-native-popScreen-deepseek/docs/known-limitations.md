@@ -37,9 +37,28 @@ For a full per-manufacturer guide, see: https://dontkillmyapp.com
 
 ## FLAG_NOT_FOCUSABLE and soft keyboard behavior
 
-When the overlay contains a `TextInput`, receiving focus requires the
-overlay window's `FLAG_NOT_FOCUSABLE` to be cleared. This is handled
-automatically inside the library, but on some OEM skins the soft keyboard
-may resize or shift the overlay window in unexpected ways when it appears.
-If you observe this, set a fixed window size via `PopScreen.setSizeConstraints`
-to prevent the window from being affected by the keyboard's inset changes.
+The overlay window is permanently `FLAG_NOT_FOCUSABLE` so it never steals
+focus from the app behind and touches outside the panel keep passing
+through. When the user taps a `TextInput`, the library requests focus and
+force-opens the soft keyboard (`showSoftInput(SHOW_FORCED)`) **without
+clearing `FLAG_NOT_FOCUSABLE`**, so the app behind the overlay stays
+interactive even while the keyboard is open.
+
+On the rare OEM that refuses to show the keyboard for a non-focusable
+window, the library automatically falls back to temporarily clearing
+`FLAG_NOT_FOCUSABLE` (keeping `FLAG_NOT_TOUCH_MODAL` set). The keyboard
+opens reliably, and because the window never consumes touches outside the
+panel, the app behind the overlay stays fully interactive while the
+keyboard is up. Tapping the app behind takes window focus away from the
+overlay, which dismisses the keyboard and restores the non-focusable flags.
+
+Because the window stays non-focusable it never receives IME insets, so the
+overlay will not pan or resize to stay above the keyboard. If the overlay is
+positioned low on screen, the keyboard may cover its lower part — keep text
+fields in the upper area of the panel, or have the app move the window (via
+`PopScreen.setWindowRect`) before showing the keyboard.
+
+Some OEM skins may also resize or shift the overlay window in unexpected
+ways when the keyboard appears. If you observe this, set a fixed window
+size via `PopScreen.setSizeConstraints` to prevent the window from being
+affected by the keyboard's inset changes.
