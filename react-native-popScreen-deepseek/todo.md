@@ -1,6 +1,6 @@
 Email: faria.porna.kaz@gmail.com
-Download Link: https://expo.dev/artifacts/eas/zlra8O2hH53Cdqb_yCllc7r6phze_T_dmBt8oxjJXmc.apk
-Status: Showing Overlay with counter and todo functionality in TypeScript
+Download Link: https://expo.dev/artifacts/eas/fQ2B1ee7BPF3bD4pkmQeiHjU1rDCQOrptPx3bpubCYI.apk
+Status: Showing Overlay with counter and todo functionality in TypeScript with keyborad off in input focus out
 
 1. Keyboard should off if clicked outside the input field
 2. Overlay header should have close button and back to main app button

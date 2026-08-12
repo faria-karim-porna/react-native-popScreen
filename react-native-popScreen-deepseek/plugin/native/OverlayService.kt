@@ -207,13 +207,22 @@ class OverlayService : Service() {
     // the app behind touchable in the rare focusable input-fallback mode:
     // without it, a focusable window consumes EVERY pointer event on screen
     // and the app behind becomes unresponsive while the keyboard is up.
+    //
+    // FLAG_WATCH_OUTSIDE_TOUCH makes the window receive a single ACTION_OUTSIDE
+    // event whenever a touch STARTS outside the panel, without consuming it —
+    // the window below still gets the touch, so the app behind stays fully
+    // interactive. The IME (soft keyboard) is drawn ABOVE overlay windows, so
+    // key presses never produce this event; touches on the app behind do. The
+    // service uses it to dismiss the keyboard when the user touches outside
+    // the overlay (see [handleOutsideTouch]).
     val lp = WindowManager.LayoutParams(
       rect.width(),
       rect.height(),
       WindowManager.LayoutParams.TYPE_APPLICATION_OVERLAY,
       WindowManager.LayoutParams.FLAG_NOT_FOCUSABLE or
         WindowManager.LayoutParams.FLAG_ALT_FOCUSABLE_IM or
-        WindowManager.LayoutParams.FLAG_NOT_TOUCH_MODAL,
+        WindowManager.LayoutParams.FLAG_NOT_TOUCH_MODAL or
+        WindowManager.LayoutParams.FLAG_WATCH_OUTSIDE_TOUCH,
       PixelFormat.TRANSLUCENT
     ).apply {
       gravity = Gravity.TOP or Gravity.START
@@ -245,6 +254,7 @@ class OverlayService : Service() {
     containerView.onGestureEnd = ::emitGestureEnd
     containerView.onContentTouch = ::handleContentTouch
     containerView.onWindowFocusLost = ::handleWindowFocusLost
+    containerView.onOutsideTouch = ::handleOutsideTouch
 
     try {
       windowManager.addView(containerView, lp)
@@ -332,10 +342,14 @@ class OverlayService : Service() {
   // interactive while the keyboard is up (and tapping it takes window focus,
   // which dismisses the keyboard and restores the non-focusable flags).
   private fun handleContentTouch(x: Float, y: Float) {
-    // Only touch a text field when the tap actually lands on one. Tapping
-    // anywhere else keeps the window non-focusable, so the app behind the
-    // overlay keeps receiving touch events.
-    val target = findEditTextViewAt(x, y) ?: return
+    val target = findEditTextViewAt(x, y)
+    if (target == null) {
+      // Tapped on content but not on a text field — dismiss the keyboard if
+      // one is open, so that focusing out of an input field closes the
+      // keyboard as the user expects.
+      dismissInputMode()
+      return
+    }
     // Ask the IME to stay compact (bottom-anchored) rather than claiming the
     // whole screen — in fullscreen mode some IMEs cover the entire display
     // and eat touches meant for the app behind the overlay.
@@ -350,6 +364,11 @@ class OverlayService : Service() {
   private var nonFocusableAttemptActive = false
   private var deviceNeedsFocusableInput = false
   private var inputAttemptEpoch = 0
+
+  // Set while the non-focusable keyboard is on screen (see [watchForKeyboardGone]).
+  // Lets [isInputActive] stay accurate on API < 30, where the connection-based
+  // [isKeyboardVisible] heuristic can be false even while the IME is visible.
+  private var nonFocusableKeyboardActive = false
 
   /**
    * Opens the soft keyboard while the window stays FLAG_NOT_FOCUSABLE.
@@ -366,6 +385,9 @@ class OverlayService : Service() {
     val epoch = ++inputAttemptEpoch
     mainHandler.postDelayed({
       nonFocusableAttemptActive = false
+      // A dismissal (or newer attempt) bumped the epoch meanwhile — abort
+      // instead of re-opening the keyboard we just closed.
+      if (epoch != inputAttemptEpoch) return@postDelayed
       if (container == null || !target.isShown) return@postDelayed
       target.requestFocus()
       val imm = getSystemService(Context.INPUT_METHOD_SERVICE) as? InputMethodManager
@@ -458,13 +480,15 @@ class OverlayService : Service() {
   }
 
   /**
-   * While typing in the non-focusable window the keyboard stays up until the
-   * user presses back (taps on the app behind pass through but don't dismiss
-   * it — the app behind never held focus to lose). Once the keyboard is
-   * gone, drop the EditText's focus so the next tap starts clean.
+   * Watches the non-focusable keyboard until it goes away, then drops the
+   * EditText's focus so the next tap starts clean. The keyboard normally goes
+   * away because the user pressed back or touched outside the overlay (see
+   * [handleOutsideTouch]); this chain just confirms the dismissal and clears
+   * focus.
    */
   private fun watchForKeyboardGone(imm: InputMethodManager?, goneStreak: Int = 0, epoch: Int = inputAttemptEpoch) {
     if (container == null) return
+    nonFocusableKeyboardActive = true
     val active = isKeyboardVisible(imm)
     if (active) {
       mainHandler.postDelayed({ watchForKeyboardGone(imm, 0, epoch) }, 150)
@@ -474,6 +498,7 @@ class OverlayService : Service() {
       mainHandler.postDelayed({ watchForKeyboardGone(imm, goneStreak + 1, epoch) }, 150)
       return
     }
+    nonFocusableKeyboardActive = false
     // Only clear focus if no newer input attempt has started since — a
     // stale chain must not steal focus from a freshly tapped field.
     if (epoch == inputAttemptEpoch) {
@@ -530,6 +555,62 @@ class OverlayService : Service() {
   private var inputModeWatchActive = false
   private var keyboardEverActive = false
   private var lastKeyboardActiveAt = 0L
+
+  /**
+   * Dismisses the soft keyboard and restores the non-focusable window flags.
+   * Called when the user taps inside the overlay content area but outside any
+   * text field — this is the "focusing out" gesture that should close the
+   * keyboard.
+   */
+  private fun dismissInputMode() {
+    // Bump the epoch so any pending non-focusable input attempt (the 60 ms
+    // delayed callback in [startNonFocusableInput]) sees a stale epoch and
+    // aborts instead of re-opening the keyboard we just closed.
+    inputAttemptEpoch++
+    nonFocusableAttemptActive = false
+    nonFocusableKeyboardActive = false
+    if (inputModeWatchActive) {
+      // Already in focusable input mode — tear it down.
+      setWindowInputFocusable(false)
+      inputModeWatchActive = false
+    }
+    val imm = getSystemService(Context.INPUT_METHOD_SERVICE) as? InputMethodManager
+    imm?.hideSoftInputFromWindow(rootView?.windowToken, 0)
+    rootView?.clearFocus()
+  }
+
+  /** True while the overlay is actively using the soft keyboard in either input path. */
+  private fun isInputActive(): Boolean {
+    if (inputModeWatchActive || nonFocusableAttemptActive || nonFocusableKeyboardActive) {
+      return true
+    }
+    val imm = getSystemService(Context.INPUT_METHOD_SERVICE) as? InputMethodManager
+    return isKeyboardVisible(imm)
+  }
+
+  /**
+   * A touch landed outside the overlay panel, on a window below it — most
+   * commonly the host app behind the overlay. FLAG_WATCH_OUTSIDE_TOUCH only
+   * reports touches that start outside the panel and does NOT consume them,
+   * so the app behind still receives the touch and stays fully interactive;
+   * this callback is a pure observer that closes the keyboard.
+   *
+   * The IME is drawn above overlay windows, so pressing keys on the soft
+   * keyboard never triggers this — typing is never interrupted. As a defensive
+   * measure for OEMs that deviate from the standard z-order, events whose
+   * coordinates the framework zeroed out (touches on windows owned by a
+   * different uid) are also ignored: dismissing there could close the
+   * keyboard while the user is typing on it.
+   */
+  private fun handleOutsideTouch(ev: MotionEvent) {
+    if (!isInputActive()) return
+    val lp = params
+    val zeroed = (ev.x == 0f && ev.y == 0f) ||
+      (ev.rawX == 0f && ev.rawY == 0f) ||
+      (lp != null && ev.x == -lp.x.toFloat() && ev.y == -lp.y.toFloat())
+    if (zeroed) return
+    dismissInputMode()
+  }
 
   private fun startInputModeWatcher() {
     if (inputModeWatchActive) return
@@ -649,6 +730,9 @@ class OverlayService : Service() {
     container = null
     rootView = null
     params = null
+    // Any in-flight polling chain dies with [container], but the state flag
+    // would otherwise linger into the next session.
+    nonFocusableKeyboardActive = false
   }
 
   private fun syncGestureParams() {
@@ -687,6 +771,9 @@ class OverlayTouchContainer(context: Context) : FrameLayout(context) {
 
   /** Invoked when the window loses window focus (tap outside / back press). */
   var onWindowFocusLost: (() -> Unit)? = null
+
+  /** Invoked when a touch starts outside the window (ACTION_OUTSIDE, FLAG_WATCH_OUTSIDE_TOUCH). */
+  var onOutsideTouch: ((ev: MotionEvent) -> Unit)? = null
 
   private var mode = 0 // 0 none, 1 drag, 2 resize
   private var lastX = 0f
@@ -754,6 +841,13 @@ class OverlayTouchContainer(context: Context) : FrameLayout(context) {
   }
 
   override fun onTouchEvent(ev: MotionEvent): Boolean {
+    // ACTION_OUTSIDE (FLAG_WATCH_OUTSIDE_TOUCH) — a touch started outside the
+    // panel. Report it to the service. The event is never consumed, so the
+    // window below still receives the touch.
+    if (ev.actionMasked == MotionEvent.ACTION_OUTSIDE) {
+      onOutsideTouch?.invoke(ev)
+      return true
+    }
     if (mode == 0) return false
     when (ev.actionMasked) {
       MotionEvent.ACTION_MOVE -> {
