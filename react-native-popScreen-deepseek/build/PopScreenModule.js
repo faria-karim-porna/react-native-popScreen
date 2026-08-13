@@ -3,11 +3,10 @@ Object.defineProperty(exports, "__esModule", { value: true });
 exports.PopScreenModule = void 0;
 const react_native_1 = require("react-native");
 const { PopScreen } = react_native_1.NativeModules;
-/**
- * The native PopScreen module.
- * Falls back to a stub if the native module is not available.
- */
-exports.PopScreenModule = PopScreen !== null && PopScreen !== void 0 ? PopScreen : {
+const DEFAULT_MIN_SIZE = 150;
+const DEFAULT_DRAG_HANDLE_DP = 32;
+const DEFAULT_RESIZE_HANDLE_DP = 24;
+const rawModule = PopScreen !== null && PopScreen !== void 0 ? PopScreen : {
     hasOverlayPermission: async () => false,
     requestOverlayPermission: async () => { },
     hasBatteryOptimizationExemption: async () => false,
@@ -24,5 +23,25 @@ exports.PopScreenModule = PopScreen !== null && PopScreen !== void 0 ? PopScreen
     setWindowRect: async () => { },
     setSizeConstraints: async () => { },
     setHandleDimensions: async () => { },
+};
+/**
+ * The native PopScreen module wrapper.
+ * Sanitizes undefined numbers with default values so the Android bridge never throws NullPointerException on primitive unboxing.
+ * Falls back to a stub if the native module is not available.
+ */
+exports.PopScreenModule = {
+    ...rawModule,
+    setWindowRect: (x, y, width, height) => {
+        var _a, _b;
+        return (_b = (_a = rawModule.setWindowRect) === null || _a === void 0 ? void 0 : _a.call(rawModule, x !== null && x !== void 0 ? x : -1, y !== null && y !== void 0 ? y : -1, width !== null && width !== void 0 ? width : -1, height !== null && height !== void 0 ? height : -1)) !== null && _b !== void 0 ? _b : Promise.resolve();
+    },
+    setSizeConstraints: (minWidth, minHeight, maxWidth, maxHeight) => {
+        var _a, _b;
+        return (_b = (_a = rawModule.setSizeConstraints) === null || _a === void 0 ? void 0 : _a.call(rawModule, minWidth !== null && minWidth !== void 0 ? minWidth : DEFAULT_MIN_SIZE, minHeight !== null && minHeight !== void 0 ? minHeight : DEFAULT_MIN_SIZE, maxWidth !== null && maxWidth !== void 0 ? maxWidth : 0, maxHeight !== null && maxHeight !== void 0 ? maxHeight : 0)) !== null && _b !== void 0 ? _b : Promise.resolve();
+    },
+    setHandleDimensions: (dragHandleHeightDp, resizeHandleSizeDp) => {
+        var _a, _b;
+        return (_b = (_a = rawModule.setHandleDimensions) === null || _a === void 0 ? void 0 : _a.call(rawModule, dragHandleHeightDp !== null && dragHandleHeightDp !== void 0 ? dragHandleHeightDp : DEFAULT_DRAG_HANDLE_DP, resizeHandleSizeDp !== null && resizeHandleSizeDp !== void 0 ? resizeHandleSizeDp : DEFAULT_RESIZE_HANDLE_DP)) !== null && _b !== void 0 ? _b : Promise.resolve();
+    },
 };
 //# sourceMappingURL=PopScreenModule.js.map

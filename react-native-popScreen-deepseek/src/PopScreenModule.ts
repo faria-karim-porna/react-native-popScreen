@@ -18,11 +18,11 @@ export interface PopScreenNativeModule {
   setHandleDimensions(dragHandleHeightDp?: number, resizeHandleSizeDp?: number): Promise<void>;
 }
 
-/**
- * The native PopScreen module.
- * Falls back to a stub if the native module is not available.
- */
-export const PopScreenModule: PopScreenNativeModule = PopScreen ?? {
+const DEFAULT_MIN_SIZE = 150;
+const DEFAULT_DRAG_HANDLE_DP = 32;
+const DEFAULT_RESIZE_HANDLE_DP = 24;
+
+const rawModule = PopScreen ?? {
   hasOverlayPermission: async () => false,
   requestOverlayPermission: async () => {},
   hasBatteryOptimizationExemption: async () => false,
@@ -40,3 +40,32 @@ export const PopScreenModule: PopScreenNativeModule = PopScreen ?? {
   setSizeConstraints: async () => {},
   setHandleDimensions: async () => {},
 };
+
+/**
+ * The native PopScreen module wrapper.
+ * Sanitizes undefined numbers with default values so the Android bridge never throws NullPointerException on primitive unboxing.
+ * Falls back to a stub if the native module is not available.
+ */
+export const PopScreenModule: PopScreenNativeModule = {
+  ...rawModule,
+  setWindowRect: (x, y, width, height) =>
+    rawModule.setWindowRect?.(
+      x ?? -1,
+      y ?? -1,
+      width ?? -1,
+      height ?? -1
+    ) ?? Promise.resolve(),
+  setSizeConstraints: (minWidth, minHeight, maxWidth, maxHeight) =>
+    rawModule.setSizeConstraints?.(
+      minWidth ?? DEFAULT_MIN_SIZE,
+      minHeight ?? DEFAULT_MIN_SIZE,
+      maxWidth ?? 0,
+      maxHeight ?? 0
+    ) ?? Promise.resolve(),
+  setHandleDimensions: (dragHandleHeightDp, resizeHandleSizeDp) =>
+    rawModule.setHandleDimensions?.(
+      dragHandleHeightDp ?? DEFAULT_DRAG_HANDLE_DP,
+      resizeHandleSizeDp ?? DEFAULT_RESIZE_HANDLE_DP
+    ) ?? Promise.resolve(),
+};
+

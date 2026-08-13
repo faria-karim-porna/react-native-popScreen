@@ -161,25 +161,29 @@ class PopScreenModule(private val reactContext: ReactApplicationContext) :
   }
 
   @ReactMethod
-  fun setWindowRect(x: Double?, y: Double?, width: Double?, height: Double?) {
-    OverlayService.updateWindowRect(x?.toInt(), y?.toInt(), width?.toInt(), height?.toInt())
+  fun setWindowRect(x: Double, y: Double, width: Double, height: Double) {
+    val xInt = if (x >= 0) x.toInt() else null
+    val yInt = if (y >= 0) y.toInt() else null
+    val wInt = if (width > 0) width.toInt() else null
+    val hInt = if (height > 0) height.toInt() else null
+    OverlayService.updateWindowRect(xInt, yInt, wInt, hInt)
   }
 
   @ReactMethod
-  fun setSizeConstraints(minWidth: Double?, minHeight: Double?, maxWidth: Double?, maxHeight: Double?) {
+  fun setSizeConstraints(minWidth: Double, minHeight: Double, maxWidth: Double, maxHeight: Double) {
     OverlayService.setConstraints(
-      minWidth?.toInt() ?: OverlayService.DEFAULT_MIN_SIZE,
-      minHeight?.toInt() ?: OverlayService.DEFAULT_MIN_SIZE,
-      maxWidth?.toInt() ?: 0,
-      maxHeight?.toInt() ?: 0
+      if (minWidth > 0) minWidth.toInt() else OverlayService.DEFAULT_MIN_SIZE,
+      if (minHeight > 0) minHeight.toInt() else OverlayService.DEFAULT_MIN_SIZE,
+      if (maxWidth > 0) maxWidth.toInt() else 0,
+      if (maxHeight > 0) maxHeight.toInt() else 0
     )
   }
 
   @ReactMethod
-  fun setHandleDimensions(dragHandleHeightDp: Double?, resizeHandleSizeDp: Double?) {
+  fun setHandleDimensions(dragHandleHeightDp: Double, resizeHandleSizeDp: Double) {
     OverlayService.setHandleDimensions(
-      dragHandleHeightDp?.toInt() ?: OverlayService.DEFAULT_DRAG_HANDLE_DP,
-      resizeHandleSizeDp?.toInt() ?: OverlayService.DEFAULT_RESIZE_HANDLE_DP
+      if (dragHandleHeightDp >= 0) dragHandleHeightDp.toInt() else OverlayService.DEFAULT_DRAG_HANDLE_DP,
+      if (resizeHandleSizeDp >= 0) resizeHandleSizeDp.toInt() else OverlayService.DEFAULT_RESIZE_HANDLE_DP
     )
   }
 

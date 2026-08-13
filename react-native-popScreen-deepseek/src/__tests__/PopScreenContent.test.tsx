@@ -61,14 +61,14 @@ describe('PopScreenContent', () => {
     act(() => {
       create(<PopScreenContent dragHandleHeight={48}><></></PopScreenContent>);
     });
-    expect(mockSetHandleDimensions).toHaveBeenCalledWith(48, undefined);
+    expect(mockSetHandleDimensions).toHaveBeenCalledWith(48, 24);
   });
 
   it('calls setHandleDimensions when resizeHandleSize prop is provided', () => {
     act(() => {
       create(<PopScreenContent resizeHandleSize={36}><></></PopScreenContent>);
     });
-    expect(mockSetHandleDimensions).toHaveBeenCalledWith(undefined, 36);
+    expect(mockSetHandleDimensions).toHaveBeenCalledWith(32, 36);
   });
 
   it('does not call setHandleDimensions when no handle props are provided', () => {

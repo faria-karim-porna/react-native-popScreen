@@ -37,9 +37,6 @@ export default function InputSubmitOverlayContent() {
   return (
     <PopScreenContent>
       <View style={styles.container}>
-        <View style={styles.dragHandle}>
-          <Text style={styles.dragHandleText}>≡ Input Submit</Text>
-        </View>
         <View style={styles.content}>
           <View style={styles.inputRow}>
             <TextInput
@@ -73,8 +70,6 @@ export default function InputSubmitOverlayContent() {
 
 const styles = StyleSheet.create({
   container: { flex: 1, backgroundColor: 'rgba(30,30,45,0.95)', borderRadius: 20, overflow: 'hidden' },
-  dragHandle: { height: 32, backgroundColor: 'rgba(255,255,255,0.08)', justifyContent: 'center', alignItems: 'center' },
-  dragHandleText: { color: '#888', fontSize: 11 },
   content: { flex: 1, padding: 10, gap: 8 },
   inputRow: { flexDirection: 'row', gap: 8 },
   input: {

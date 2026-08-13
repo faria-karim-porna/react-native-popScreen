@@ -58,8 +58,21 @@ export default function TodoOverlayContent() {
   const doneCount = todos.filter((todo) => todo.done).length;
 
   return (
-    <PopScreenContent showHeader={true} header={<PopScreenHeader title="≡ Todo List" />}>
+    /**
+     * dragHandleHeight={0} disables the native drag-handle touch interceptor
+     * at the top of the window. Without this, the native OverlayTouchContainer
+     * steals ACTION_DOWN events in the top 32dp band, preventing the header's
+     * Cancel and Back to Main App Pressable buttons from receiving taps.
+     *
+     * The overlay can still be dragged by the user grabbing the bottom part of
+     * the header or any other non-interactive area if a resize/drag gesture is
+     * set up, but the button tap area is now fully handed to React Native.
+     */
+    <PopScreenContent dragHandleHeight={0}>
       <View style={styles.container}>
+        {/* Header lives inside the dark rounded container */}
+        <PopScreenHeader title="Todo List" />
+
         <View style={styles.content}>
           <View style={styles.inputRow}>
             <TextInput
@@ -114,8 +127,6 @@ export default function TodoOverlayContent() {
 
 const styles = StyleSheet.create({
   container: { flex: 1, backgroundColor: 'rgba(30,30,45,0.95)', borderRadius: 20, overflow: 'hidden' },
-  dragHandle: { height: 32, backgroundColor: 'rgba(255,255,255,0.08)', justifyContent: 'center', alignItems: 'center' },
-  dragHandleText: { color: '#888', fontSize: 11 },
   content: { flex: 1, padding: 10, gap: 8 },
   inputRow: { flexDirection: 'row', gap: 8 },
   input: {

@@ -14,7 +14,8 @@ export interface PopScreenNativeModule {
     setHandleDimensions(dragHandleHeightDp?: number, resizeHandleSizeDp?: number): Promise<void>;
 }
 /**
- * The native PopScreen module.
+ * The native PopScreen module wrapper.
+ * Sanitizes undefined numbers with default values so the Android bridge never throws NullPointerException on primitive unboxing.
  * Falls back to a stub if the native module is not available.
  */
 export declare const PopScreenModule: PopScreenNativeModule;

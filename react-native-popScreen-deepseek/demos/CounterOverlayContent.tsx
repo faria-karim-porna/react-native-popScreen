@@ -14,6 +14,10 @@ import { usePopScreen } from '../src/usePopScreen';
  * host app's panel updates instantly — no Context, no events, no bridge
  * overhead. Both surfaces read/write the exact same in-memory value
  * because they share the same JS process.
+ *
+ * Counter overlay is intentionally headerless — the native drag-handle
+ * region (top 32dp) is kept so the entire top strip can be used to drag
+ * the window.
  */
 export default function CounterOverlayContent() {
   const [count, setCount] = usePopScreen<number>('count', 0);
@@ -21,9 +25,6 @@ export default function CounterOverlayContent() {
   return (
     <PopScreenContent>
       <View style={styles.container}>
-        <View style={styles.dragHandle}>
-          <Text style={styles.dragHandleText}>≡ Counter</Text>
-        </View>
         <View style={styles.content}>
           <Text style={styles.countText}>{count}</Text>
           <View style={styles.buttonRow}>
@@ -48,8 +49,6 @@ export default function CounterOverlayContent() {
 
 const styles = StyleSheet.create({
   container: { flex: 1, backgroundColor: 'rgba(30,30,45,0.95)', borderRadius: 20, overflow: 'hidden' },
-  dragHandle: { height: 32, backgroundColor: 'rgba(255,255,255,0.08)', justifyContent: 'center', alignItems: 'center' },
-  dragHandleText: { color: '#888', fontSize: 11 },
   content: { flex: 1, justifyContent: 'center', alignItems: 'center', gap: 14 },
   countText: { color: 'white', fontSize: 40, fontWeight: '700' },
   buttonRow: { flexDirection: 'row', gap: 16 },
