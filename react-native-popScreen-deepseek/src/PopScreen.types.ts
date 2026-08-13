@@ -1,3 +1,5 @@
+export type OverlayShape = 'rectangle' | 'rounded' | 'circle' | 'square' | 'pill';
+
 export type ReactArchitecture = 'NEW_ARCHITECTURE' | 'OLD_ARCHITECTURE' | 'UNKNOWN';
 
 export type ReactArchitectureInfo = {

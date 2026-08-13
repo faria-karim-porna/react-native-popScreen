@@ -4,6 +4,7 @@ import { StatusBar } from 'expo-status-bar';
 import { usePopScreen } from './src/usePopScreen';
 import CounterMainAppPanel from './demos/CounterMainAppPanel';
 import TodoMainAppPanel from './demos/TodoMainAppPanel';
+import OverlayCustomizerPanel from './demos/OverlayCustomizerPanel';
 
 const { PopScreen } = NativeModules;
 const eventEmitter = PopScreen ? new NativeEventEmitter(PopScreen) : null;
@@ -56,6 +57,8 @@ export default function App() {
 
       {activeDemo === 'counter' && <CounterMainAppPanel />}
       {activeDemo === 'todo' && <TodoMainAppPanel />}
+
+      <OverlayCustomizerPanel />
 
       <View style={styles.buttonGroup}>
         <Button title="Show Overlay" disabled={!hasPermission}

@@ -19,11 +19,20 @@ import { usePopScreen } from '../src/usePopScreen';
  * region (top 32dp) is kept so the entire top strip can be used to drag
  * the window.
  */
-export default function CounterOverlayContent() {
+import { OverlayShape } from '../src/PopScreen.types';
+
+export interface OverlayDemoProps {
+  shape?: OverlayShape;
+  borderRadius?: number;
+  width?: number;
+  height?: number;
+}
+
+export default function CounterOverlayContent({ shape, borderRadius, width, height }: OverlayDemoProps = {}) {
   const [count, setCount] = usePopScreen<number>('count', 0);
 
   return (
-    <PopScreenContent>
+    <PopScreenContent shape={shape} borderRadius={borderRadius} width={width} height={height}>
       <View style={styles.container}>
         <View style={styles.content}>
           <Text style={styles.countText}>{count}</Text>
@@ -48,7 +57,7 @@ export default function CounterOverlayContent() {
 }
 
 const styles = StyleSheet.create({
-  container: { flex: 1, backgroundColor: 'rgba(30,30,45,0.95)', borderRadius: 20, overflow: 'hidden' },
+  container: { flex: 1, backgroundColor: 'rgba(30,30,45,0.95)' },
   content: { flex: 1, justifyContent: 'center', alignItems: 'center', gap: 14 },
   countText: { color: 'white', fontSize: 40, fontWeight: '700' },
   buttonRow: { flexDirection: 'row', gap: 16 },

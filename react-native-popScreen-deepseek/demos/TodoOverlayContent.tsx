@@ -3,6 +3,7 @@ import { View, Text, TextInput, Pressable, FlatList, StyleSheet } from 'react-na
 import PopScreenContent from '../src/PopScreenContent';
 import PopScreenHeader from '../src/PopScreenHeader';
 import { usePopScreen } from '../src/usePopScreen';
+import { OverlayDemoProps } from './CounterOverlayContent';
 
 export interface TodoItem {
   id: string;
@@ -34,7 +35,7 @@ const DEFAULT_TODOS: TodoItem[] = [];
  *  - This Todo demo      → shared `array` (objects) state
  *  - Input Submit demo   → purely LOCAL `useState` (does not leak)
  */
-export default function TodoOverlayContent() {
+export default function TodoOverlayContent({ shape, borderRadius, width, height }: OverlayDemoProps = {}) {
   const [todos, setTodos] = usePopScreen<TodoItem[]>('todos', DEFAULT_TODOS);
   const [draft, setDraft] = useState('');
 
@@ -68,8 +69,8 @@ export default function TodoOverlayContent() {
      * the header or any other non-interactive area if a resize/drag gesture is
      * set up, but the button tap area is now fully handed to React Native.
      */
-    <PopScreenContent dragHandleHeight={0}>
-      <View style={styles.container}>
+    <PopScreenContent dragHandleHeight={0} shape={shape} borderRadius={borderRadius} width={width} height={height}>
+      <View style={[styles.container, borderRadius !== undefined && { borderRadius }]}>
         {/* Header lives inside the dark rounded container */}
         <PopScreenHeader title="Todo List" />
 

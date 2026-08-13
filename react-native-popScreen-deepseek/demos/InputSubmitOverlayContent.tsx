@@ -23,7 +23,9 @@ import PopScreenContent from '../src/PopScreenContent';
  * clears the flag when a text field is tapped, and restores it as
  * soon as the soft keyboard is dismissed.
  */
-export default function InputSubmitOverlayContent() {
+import { OverlayDemoProps } from './CounterOverlayContent';
+
+export default function InputSubmitOverlayContent({ shape, borderRadius, width, height }: OverlayDemoProps = {}) {
   const [draft, setDraft] = useState('');
   const [submissions, setSubmissions] = useState<string[]>([]);
 
@@ -35,7 +37,7 @@ export default function InputSubmitOverlayContent() {
   };
 
   return (
-    <PopScreenContent>
+    <PopScreenContent shape={shape} borderRadius={borderRadius} width={width} height={height}>
       <View style={styles.container}>
         <View style={styles.content}>
           <View style={styles.inputRow}>

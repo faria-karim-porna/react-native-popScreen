@@ -6,6 +6,8 @@ jest.mock('react-native', () => ({
   NativeModules: {
     PopScreen: {
       setHandleDimensions: jest.fn().mockResolvedValue(undefined),
+      setWindowRect: jest.fn().mockResolvedValue(undefined),
+      setSizeConstraints: jest.fn().mockResolvedValue(undefined),
     },
   },
   Platform: { OS: 'android', Version: 30, select: (obj: any) => obj.android ?? obj.default },
@@ -53,9 +55,15 @@ import { NativeModules } from 'react-native';
 import PopScreenContent from '../PopScreenContent';
 
 const mockSetHandleDimensions = NativeModules.PopScreen.setHandleDimensions;
+const mockSetWindowRect = NativeModules.PopScreen.setWindowRect;
+const mockSetSizeConstraints = NativeModules.PopScreen.setSizeConstraints;
 
 describe('PopScreenContent', () => {
-  beforeEach(() => mockSetHandleDimensions.mockClear());
+  beforeEach(() => {
+    mockSetHandleDimensions.mockClear();
+    mockSetWindowRect.mockClear();
+    mockSetSizeConstraints.mockClear();
+  });
 
   it('calls setHandleDimensions when dragHandleHeight prop is provided', () => {
     act(() => {
@@ -76,6 +84,43 @@ describe('PopScreenContent', () => {
       create(<PopScreenContent><></></PopScreenContent>);
     });
     expect(mockSetHandleDimensions).not.toHaveBeenCalled();
+  });
+
+  it('calls setWindowRect when width or height props are provided', () => {
+    act(() => {
+      create(<PopScreenContent width={300} height={400}><></></PopScreenContent>);
+    });
+    expect(mockSetWindowRect).toHaveBeenCalledWith(-1, -1, 300, 400);
+  });
+
+  it('calls setSizeConstraints when min/max constraints are provided', () => {
+    act(() => {
+      create(<PopScreenContent minWidth={200} minHeight={200} maxWidth={500} maxHeight={500}><></></PopScreenContent>);
+    });
+    expect(mockSetSizeConstraints).toHaveBeenCalledWith(200, 200, 500, 500);
+  });
+
+  it('applies shape and borderRadius container styles', () => {
+    let rootCircle: any;
+    let rootCustom: any;
+    act(() => {
+      rootCircle = create(<PopScreenContent shape="circle"><></></PopScreenContent>);
+      rootCustom = create(<PopScreenContent shape="rounded" borderRadius={28}><></></PopScreenContent>);
+    });
+
+    const circleStyle = rootCircle.toJSON().props.style;
+    const customStyle = rootCustom.toJSON().props.style;
+
+    expect(circleStyle).toEqual(
+      expect.arrayContaining([
+        expect.objectContaining({ borderRadius: 9999, aspectRatio: 1, overflow: 'hidden' }),
+      ])
+    );
+    expect(customStyle).toEqual(
+      expect.arrayContaining([
+        expect.objectContaining({ borderRadius: 28, overflow: 'hidden' }),
+      ])
+    );
   });
 
   it('renders header when showHeader prop is true', () => {
