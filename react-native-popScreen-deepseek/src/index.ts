@@ -38,6 +38,10 @@ export async function destroy(): Promise<void> {
   return PopScreenModule.destroy();
 }
 
+export async function openApp(): Promise<void> {
+  return PopScreenModule.openApp();
+}
+
 // ─── Architecture detection ──────────────────────────────────────────
 
 export async function getReactArchitectureInfo() {
@@ -105,6 +109,8 @@ export { minimize, restore, getIsMinimized } from './minimizeRestore';
 // ─── Components & helpers ────────────────────────────────────────────
 
 export { default as PopScreenContent } from './PopScreenContent';
+export { default as PopScreenHeader } from './PopScreenHeader';
+export type { PopScreenHeaderProps } from './PopScreenHeader';
 export { registerOverlaySurface } from './registerOverlaySurface';
 
 // ─── Shared store hook ───────────────────────────────────────────────

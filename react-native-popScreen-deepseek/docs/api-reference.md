@@ -30,6 +30,9 @@ Removes the overlay window. The Service remains running so `show()` can reattach
 ### `destroy(): Promise<void>`
 Fully tears down the overlay: removes the window, stops the Service, releases all native resources.
 
+### `openApp(): Promise<void>`
+Brings the host app's main activity to the foreground.
+
 ## Window geometry
 
 ### `setWindowRect(x?, y?, width?, height?): Promise<void>`
@@ -38,10 +41,18 @@ Sets the window's position and/or size directly. Any parameter may be omitted.
 ### `setSizeConstraints(minWidth?, minHeight?, maxWidth?, maxHeight?): Promise<void>`
 Sets limits on how small or large the window may be during user resize (defaults: min 150×150).
 
-## Configuration
+## Configuration & Header
 
-### `<PopScreenContent dragHandleHeight? resizeHandleSize?>`
-Wraps your overlay UI. Pass `dragHandleHeight` (dp) to override the native drag-handle region height. Pass `resizeHandleSize` (dp) to override the bottom-right resize handle hit target size.
+### `<PopScreenContent dragHandleHeight? resizeHandleSize? showHeader? header? headerProps?>`
+Wraps your overlay UI.
+- `dragHandleHeight` (dp): Overrides the native drag-handle region height.
+- `resizeHandleSize` (dp): Overrides the bottom-right resize handle target size.
+- `showHeader` (boolean): Shows or hides the header in the overlay (default: `false`).
+- `header` (ReactNode): Custom header element (overrides default `<PopScreenHeader />`).
+- `headerProps`: Props passed to default `<PopScreenHeader />`.
+
+### `<PopScreenHeader title? onCancel? onBackToApp? showCancel? showBackToApp?>`
+Configurable React Native overlay header. Includes **Cancel** (hides overlay) and **Back to Main App** (launches host app and hides overlay) buttons by default.
 
 ## State hook
 

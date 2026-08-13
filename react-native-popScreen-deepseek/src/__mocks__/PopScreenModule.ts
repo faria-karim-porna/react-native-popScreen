@@ -12,6 +12,7 @@ const PopScreenModuleMock = {
   show: jest.fn().mockResolvedValue(undefined),
   hide: jest.fn().mockResolvedValue(undefined),
   destroy: jest.fn().mockResolvedValue(undefined),
+  openApp: jest.fn().mockResolvedValue(undefined),
   setWindowRect: jest.fn().mockResolvedValue(undefined),
   setSizeConstraints: jest.fn().mockResolvedValue(undefined),
   setHandleDimensions: jest.fn().mockResolvedValue(undefined),

@@ -136,6 +136,20 @@ class PopScreenModule(private val reactContext: ReactApplicationContext) :
   }
 
   @ReactMethod
+  fun openApp() {
+    try {
+      val pm = reactContext.packageManager
+      val intent = pm.getLaunchIntentForPackage(reactContext.packageName)
+      if (intent != null) {
+        intent.addFlags(Intent.FLAG_ACTIVITY_NEW_TASK or Intent.FLAG_ACTIVITY_SINGLE_TOP)
+        reactContext.startActivity(intent)
+      }
+    } catch (t: Throwable) {
+      // Host app launch intent failed — ignore.
+    }
+  }
+
+  @ReactMethod
   fun getReactArchitectureInfo(promise: Promise) {
     val version = com.facebook.react.modules.systeminfo.ReactNativeVersion.VERSION
     val map = Arguments.createMap().apply {

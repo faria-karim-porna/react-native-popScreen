@@ -1,6 +1,7 @@
 import React, { useState } from 'react';
 import { View, Text, TextInput, Pressable, FlatList, StyleSheet } from 'react-native';
 import PopScreenContent from '../src/PopScreenContent';
+import PopScreenHeader from '../src/PopScreenHeader';
 import { usePopScreen } from '../src/usePopScreen';
 
 export interface TodoItem {
@@ -57,11 +58,8 @@ export default function TodoOverlayContent() {
   const doneCount = todos.filter((todo) => todo.done).length;
 
   return (
-    <PopScreenContent>
+    <PopScreenContent showHeader={true} header={<PopScreenHeader title="≡ Todo List" />}>
       <View style={styles.container}>
-        <View style={styles.dragHandle}>
-          <Text style={styles.dragHandleText}>≡ Todo List</Text>
-        </View>
         <View style={styles.content}>
           <View style={styles.inputRow}>
             <TextInput

@@ -17,7 +17,7 @@ var __importDefault = (this && this.__importDefault) || function (mod) {
     return (mod && mod.__esModule) ? mod : { "default": mod };
 };
 Object.defineProperty(exports, "__esModule", { value: true });
-exports.getPopScreenState = exports.usePopScreen = exports.registerOverlaySurface = exports.PopScreenContent = exports.getIsMinimized = exports.restore = exports.minimize = void 0;
+exports.getPopScreenState = exports.usePopScreen = exports.registerOverlaySurface = exports.PopScreenHeader = exports.PopScreenContent = exports.getIsMinimized = exports.restore = exports.minimize = void 0;
 exports.hasOverlayPermission = hasOverlayPermission;
 exports.requestOverlayPermission = requestOverlayPermission;
 exports.hasBatteryOptimizationExemption = hasBatteryOptimizationExemption;
@@ -25,6 +25,7 @@ exports.requestBatteryOptimizationExemption = requestBatteryOptimizationExemptio
 exports.show = show;
 exports.hide = hide;
 exports.destroy = destroy;
+exports.openApp = openApp;
 exports.getReactArchitectureInfo = getReactArchitectureInfo;
 exports.addDragUpdateListener = addDragUpdateListener;
 exports.addResizeUpdateListener = addResizeUpdateListener;
@@ -58,6 +59,9 @@ async function hide() {
 }
 async function destroy() {
     return PopScreenModule_1.PopScreenModule.destroy();
+}
+async function openApp() {
+    return PopScreenModule_1.PopScreenModule.openApp();
 }
 // ─── Architecture detection ──────────────────────────────────────────
 async function getReactArchitectureInfo() {
@@ -97,6 +101,8 @@ Object.defineProperty(exports, "getIsMinimized", { enumerable: true, get: functi
 // ─── Components & helpers ────────────────────────────────────────────
 var PopScreenContent_1 = require("./PopScreenContent");
 Object.defineProperty(exports, "PopScreenContent", { enumerable: true, get: function () { return __importDefault(PopScreenContent_1).default; } });
+var PopScreenHeader_1 = require("./PopScreenHeader");
+Object.defineProperty(exports, "PopScreenHeader", { enumerable: true, get: function () { return __importDefault(PopScreenHeader_1).default; } });
 var registerOverlaySurface_1 = require("./registerOverlaySurface");
 Object.defineProperty(exports, "registerOverlaySurface", { enumerable: true, get: function () { return registerOverlaySurface_1.registerOverlaySurface; } });
 // ─── Shared store hook ───────────────────────────────────────────────

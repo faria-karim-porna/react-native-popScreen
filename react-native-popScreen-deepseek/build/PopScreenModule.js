@@ -15,6 +15,7 @@ exports.PopScreenModule = PopScreen !== null && PopScreen !== void 0 ? PopScreen
     show: async () => { },
     hide: async () => { },
     destroy: async () => { },
+    openApp: async () => { },
     getReactArchitectureInfo: async () => ({
         architecture: 'UNKNOWN',
         isNewArchitecture: false,

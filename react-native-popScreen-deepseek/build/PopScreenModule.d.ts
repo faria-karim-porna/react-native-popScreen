@@ -7,6 +7,7 @@ export interface PopScreenNativeModule {
     show(): Promise<void>;
     hide(): Promise<void>;
     destroy(): Promise<void>;
+    openApp(): Promise<void>;
     getReactArchitectureInfo(): Promise<ReactArchitectureInfo>;
     setWindowRect(x?: number, y?: number, width?: number, height?: number): Promise<void>;
     setSizeConstraints(minWidth?: number, minHeight?: number, maxWidth?: number, maxHeight?: number): Promise<void>;

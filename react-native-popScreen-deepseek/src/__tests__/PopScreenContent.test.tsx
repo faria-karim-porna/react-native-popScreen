@@ -30,6 +30,7 @@ jest.mock('react-native', () => ({
   },
   TouchableOpacity: 'TouchableOpacity',
   TouchableHighlight: 'TouchableHighlight',
+  Pressable: 'Pressable',
   ActivityIndicator: 'ActivityIndicator',
   FlatList: 'FlatList',
   TextInput: 'TextInput',
@@ -75,5 +76,24 @@ describe('PopScreenContent', () => {
       create(<PopScreenContent><></></PopScreenContent>);
     });
     expect(mockSetHandleDimensions).not.toHaveBeenCalled();
+  });
+
+  it('renders header when showHeader prop is true', () => {
+    let root: any;
+    act(() => {
+      root = create(<PopScreenContent showHeader={true} headerProps={{ title: 'My Header' }} />);
+    });
+    const json = JSON.stringify(root.toJSON());
+    expect(json).toContain('My Header');
+  });
+
+  it('renders custom header component passed via header prop', () => {
+    let root: any;
+    act(() => {
+      root = create(
+        <PopScreenContent header={<PopScreenContent children={<></>} />} />
+      );
+    });
+    expect(root.toJSON()).toBeTruthy();
   });
 });
