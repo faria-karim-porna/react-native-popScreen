@@ -1,5 +1,5 @@
 import React, { useEffect, useState, useCallback } from 'react';
-import { View, Text, Button, StyleSheet, NativeModules, NativeEventEmitter } from 'react-native';
+import { View, Text, Button, ScrollView, StyleSheet, NativeModules, NativeEventEmitter } from 'react-native';
 import { StatusBar } from 'expo-status-bar';
 import { usePopScreen } from './src/usePopScreen';
 import CounterMainAppPanel from './demos/CounterMainAppPanel';
@@ -11,10 +11,10 @@ const eventEmitter = PopScreen ? new NativeEventEmitter(PopScreen) : null;
 
 export default function App() {
   const [hasPermission, setHasPermission] = useState(false);
-  const [hasBattery, setHasBattery] = useState(null);
+  const [hasBattery, setHasBattery] = useState<boolean | null>(null);
   const [overlayRunning, setOverlayRunning] = useState(false);
   const [archInfo, setArchInfo] = useState('checking...');
-  const [activeDemo, setActiveDemo] = usePopScreen('activeDemo', 'counter');
+  const [activeDemo, setActiveDemo] = usePopScreen<string>('activeDemo', 'counter');
   const [windowState, setWindowState] = useState('idle');
   const [permEvent, setPermEvent] = useState('none');
   const [showDebug, setShowDebug] = useState(false);
@@ -26,16 +26,16 @@ export default function App() {
 
   useEffect(() => {
     checkPermission();
-    PopScreen?.getReactArchitectureInfo().then((info) => {
+    PopScreen?.getReactArchitectureInfo().then((info: { architecture: string; isNewArchitecture: boolean }) => {
       setArchInfo(
         `${info.architecture}${info.isNewArchitecture ? ' (New Arch)' : ' (Old Arch)'}`
       );
     }).catch(() => setArchInfo('UNKNOWN'));
 
-    const windowSub = eventEmitter?.addListener('onWindowStateChange', (e) =>
+    const windowSub = eventEmitter?.addListener('onWindowStateChange', (e: { state: string; reason?: string }) =>
       setWindowState(`${e.state}${e.reason ? ` (${e.reason})` : ''}`)
     );
-    const permSub = eventEmitter?.addListener('onPermissionResult', (e) => {
+    const permSub = eventEmitter?.addListener('onPermissionResult', (e: { granted: boolean; reason?: string }) => {
       setPermEvent(`granted=${e.granted}${e.reason ? ` reason=${e.reason}` : ''}`);
       setHasPermission(e.granted);
     });
@@ -43,7 +43,7 @@ export default function App() {
   }, [checkPermission]);
 
   return (
-    <View style={styles.container}>
+    <ScrollView contentContainerStyle={styles.container}>
       <Text style={styles.title}>PopScreen Example</Text>
       <StatusBar style="auto" />
 
@@ -91,12 +91,15 @@ export default function App() {
           <Button title="Re-check Permission" onPress={checkPermission} />
         </View>
       )}
-    </View>
+    </ScrollView>
   );
 }
 
 const styles = StyleSheet.create({
-  container: { flex: 1, backgroundColor: '#fff', alignItems: 'center', justifyContent: 'center', padding: 20 },
+  // flexGrow instead of flex: 1 so the ScrollView still fills the screen when
+  // content is short; justifyContent is dropped so tall content scrolls from
+  // the top instead of being centered (which would clip the top off-screen).
+  container: { flexGrow: 1, backgroundColor: '#fff', alignItems: 'center', padding: 20 },
   title: { fontSize: 22, fontWeight: 'bold', marginBottom: 16, textAlign: 'center', color: '#1e293b' },
   sectionTitle: { fontSize: 14, fontWeight: '600', color: '#374151', marginBottom: 4 },
   demoSwitch: { flexDirection: 'row', gap: 10, marginBottom: 4 },

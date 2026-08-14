@@ -10,9 +10,9 @@ __mocks__/
 *.spec.*
 
 # Example app files (not part of the library)
-App.js
-OverlaySwitcher.js
-index.js
+App.*
+OverlaySwitcher.*
+index.*
 app.json
 demos/
 assets/
@@ -31,6 +31,9 @@ docs/
 tsconfig*.json
 babel.config.*
 jest.setup.js
+
+# Generated test coverage
+coverage/
 
 # Editor / OS / AI config
 .idea/

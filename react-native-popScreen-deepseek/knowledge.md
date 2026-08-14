@@ -22,9 +22,9 @@ of other apps.
 - **Mocks**: `src/__mocks__/` — native module mock (`PopScreenModule.ts`) and expo-modules-core mock
 - **Demos**: `demos/` — Counter (cross-surface state sync) and Input Submit (local state) demos
 - **Docs**: `docs/` — API reference, compatibility, state-sync, known-limitations, Play Policy guidance
-- **Entry point (app)**: root `index.js` calls `registerRootComponent(App)` + `registerOverlaySurface(...)`. `package.json` `main` MUST point at `index.js` — Expo/Metro resolves the app entry purely from `package.json#main`; if it points at `build/index.js` (the library build, which never calls `AppRegistry.registerComponent`), the APK builds fine but crashes at launch with `"main" has not been registered`.
+- **Entry point (app)**: root `index.tsx` calls `registerRootComponent(App)` + `registerOverlaySurface(...)`. `package.json` `main` MUST point at `index.tsx` — Expo/Metro resolves the app entry purely from `package.json#main`; if it points at `build/index.js` (the library build, which never calls `AppRegistry.registerComponent`), the APK builds fine but crashes at launch with `"main" has not been registered`.
 - **Entry point (library)**: consumers resolve the published library via the `exports` field → `build/index.js` (works on RN ≥ 0.73 / Node ≥ 12.7).
-- **Surface registration**: `registerOverlaySurface(Component)` called in root `index.js` alongside `registerRootComponent()`
+- **Surface registration**: `registerOverlaySurface(Component)` called in root `index.tsx` alongside `registerRootComponent()`
 - **State sync**: `usePopScreen(key, default)` hook backed by module-scoped external store — no Context needed
 
 ## Conventions

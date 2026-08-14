@@ -15,6 +15,13 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
   inside the drag region (header buttons, text fields) pass through to the
   content, and the window only starts dragging once the finger actually moves.
 
+### Changed
+- The example app is fully TypeScript now: `App.tsx`, `index.tsx`, and
+  `registerOverlaySurface.ts` replace the former `.js` files (`package.json`
+  `main` updated to `index.tsx`).
+- `registerOverlaySurface(component)` now types its parameter as
+  `ComponentType<any>` instead of untyped `any`.
+
 ## [1.0.0] — 2026-07-07
 
 ### Added

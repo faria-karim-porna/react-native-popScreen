@@ -12,13 +12,13 @@
 
 - The main library code lives in the `src/` folder and is already `.ts` / `.tsx` files (for example `src/usePopScreen.ts`, `src/createOverlayStore.ts`, `src/index.ts`).
 - React Native and Expo support TypeScript **out of the box**. Look at the file `tsconfig.json` — it already extends `expo/tsconfig.base` with strict mode on.
-- The app entry files (`App.js`, `index.js`) are still JavaScript, but the demo files (`demos/*.tsx`, `OverlaySwitcher.tsx`) have **already been converted to TypeScript**. TypeScript and JavaScript can mix freely — the remaining JS files can be renamed to `.tsx` / `.ts` whenever you want. Even the Jest test setup already knows how to run `.ts` and `.tsx` files.
+- The app entry files (`App.tsx`, `index.tsx`) have been converted to TypeScript too, alongside the demo files (`demos/*.tsx`, `OverlaySwitcher.tsx`). The only remaining `.js` files are build/tooling config (`app.plugin.js`, `babel.config.jest.js`, `jest.setup.js`, `scripts/`), which stay JavaScript. Even the Jest test setup already knows how to run `.ts` and `.tsx` files.
 
 **A few small things to keep in mind:**
 
 1. **Native Android code cannot be TypeScript.** The Kotlin files (`OverlayService.kt`, `PopScreenModule.kt`) must stay in Kotlin. TypeScript only replaces JavaScript, not native code.
 2. React component types come from `@types/react` (already available in `node_modules`, pulled in by Expo's tooling).
-3. `package.json` says `"main": "index.js"`. If you rename your entry file to TypeScript, make sure this points to the correct file, because Metro finds the app entry through that field.
+3. `package.json` `"main"` points at `"index.tsx"` (the app entry). Metro finds the app entry through that field, so it must point at the entry file — not at `build/index.js` (the library build, which never registers a root component).
 
 **Simple summary:** TypeScript and JavaScript can live side by side. Nothing blocks you from using TypeScript everywhere in the JS world of this app.
 
@@ -28,13 +28,13 @@
 
 - লাইব্রেরির মূল কোড `src/` ফোল্ডারে আছে এবং সেগুলো আগেই `.ts` / `.tsx` ফাইলে লেখা (যেমন `src/usePopScreen.ts`, `src/createOverlayStore.ts`, `src/index.ts`)।
 - React Native এবং Expo TypeScript **একদম ফ্রি-তে সাপোর্ট করে**। দেখুন `tsconfig.json` ফাইলটা — এটা আগে থেকেই `expo/tsconfig.base`-কে strict মোডসহ ব্যবহার করছে।
-- অ্যাপের এন্ট্রি ফাইলগুলো (`App.js`, `index.js`) এখনো JavaScript-এ আছে, কিন্তু ডেমো ফাইলগুলো (`demos/*.tsx`, `OverlaySwitcher.tsx`) **আগেই TypeScript-এ রূপান্তর হয়ে গেছে**। TypeScript আর JavaScript সহজেই মিশে থাকতে পারে — বাকি JS ফাইলগুলোও চাইলে যেকোনো সময় `.tsx` / `.ts` নামে বদলে নিতে পারবেন। এমনকি Jest টেস্ট সিস্টেমও `.ts` এবং `.tsx` ফাইল চালাতে জানে।
+- অ্যাপের এন্ট্রি ফাইলগুলো (`App.tsx`, `index.tsx`)-ও এখন TypeScript-এ রূপান্তর হয়ে গেছে, ডেমো ফাইলগুলোর (`demos/*.tsx`, `OverlaySwitcher.tsx`) মতোই। বাকি যে `.js` ফাইলগুলো আছে সেগুলো শুধু বিল্ড/টুলিং কনফিগ (`app.plugin.js`, `babel.config.jest.js`, `jest.setup.js`, `scripts/`) — সেগুলো JavaScript-ই থাকবে। Jest টেস্ট সিস্টেমও আগেই `.ts` এবং `.tsx` ফাইল চালাতে জানে।
 
 **খেয়াল রাখার কয়েকটা ছোট বিষয়:**
 
 1. **Native Android কোড কখনো TypeScript হবে না।** Kotlin ফাইলগুলো (`OverlayService.kt`, `PopScreenModule.kt`) Kotlin-ই থাকবে। TypeScript শুধু JavaScript-এর বদলে আসে, native কোডের নয়।
 2. React কম্পোনেন্টের টাইপ আসে `@types/react` থেকে (এটা `node_modules`-এ আগে থেকেই আছে, Expo-র টুলিং ইনস্টল করে দিয়েছে)।
-3. `package.json`-এ লেখা আছে `"main": "index.js"`। এন্ট্রি ফাইলটার নাম TypeScript-এ বদলালে নিশ্চিত করুন এই ফিল্ডটা সঠিক ফাইলের দিকে দেখাচ্ছে, কারণ Metro অ্যাপের এন্ট্রি এই ফিল্ড থেকেই খোঁজে।
+3. `package.json`-এর `"main"` এখন `"index.tsx"`-এর দিকে দেখাচ্ছে (অ্যাপ এন্ট্রি)। Metro অ্যাপের এন্ট্রি এই ফিল্ড থেকেই খোঁজে, তাই এটা অবশ্যই এন্ট্রি ফাইলের দিকে দেখাতে হবে — `build/index.js`-এর দিকে নয় (ওটা লাইব্রেরি বিল্ড, যেটা কোনো root কম্পোনেন্ট রেজিস্টার করে না)।
 
 **সহজ সারকথা:** TypeScript আর JavaScript পাশাপাশি থাকতে পারে। এই অ্যাপের JS-এর জগতে TypeScript ব্যবহার করতে কোনো বাধা নেই।
 
@@ -244,6 +244,6 @@ function MainScreen() {
 
 | Question (প্রশ্ন) | Short Answer (সংক্ষিপ্ত উত্তর) |
 |---|---|
-| 1. TypeScript through the app? | **Yes** — library core is already TS, and the demos (`demos/*.tsx`, `OverlaySwitcher.tsx`) now are too; the app entry (`App.js`, `index.js`) is still JS and can be converted as well. Native Kotlin stays Kotlin. (**হ্যাঁ** — লাইব্রেরি আগেই TS-এ, আর ডেমো (`demos/*.tsx`, `OverlaySwitcher.tsx`)-ও এখন TS-এ; অ্যাপ এন্ট্রি (`App.js`, `index.js`) এখনো JS, চাইলে ওগুলোও বদলানো যাবে। Native Kotlin Kotlin-ই থাকবে।) |
+| 1. TypeScript through the app? | **Yes** — the whole JS side is TypeScript now: library core, demos (`demos/*.tsx`, `OverlaySwitcher.tsx`), and the app entry (`App.tsx`, `index.tsx`). Only native Kotlin and tooling config (`.js`) stay as-is. (**হ্যাঁ** — JS-এর পুরো দিক এখন TypeScript: লাইব্রেরি, ডেমো (`demos/*.tsx`, `OverlaySwitcher.tsx`), আর অ্যাপ এন্ট্রি (`App.tsx`, `index.tsx`)। শুধু native Kotlin আর টুলিং কনফিগ (`.js`) আগের মতোই থাকবে।) |
 | 2. Other UI instead of counter? | **Yes** — the overlay renders any RN UI. Make a component, wrap it in `<PopScreenContent>`, swap it in `OverlaySwitcher.tsx`. (**হ্যাঁ** — ওভারলে যেকোনো RN UI দেখাতে পারে। কম্পোনেন্ট বানিয়ে `<PopScreenContent>`-এ মুড়ে `OverlaySwitcher.tsx`-এ বসান।) |
 | 3. How a user uses it? | Install → `registerOverlaySurface(MyOverlay)` → build UI inside `<PopScreenContent>` → request permission → `show()` / `hide()` / `destroy()`. (ইনস্টল → `registerOverlaySurface(MyOverlay)` → `<PopScreenContent>`-এ UI বানান → পারমিশন নিন → `show()` / `hide()` / `destroy()`।) |

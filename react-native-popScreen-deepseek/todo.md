@@ -7,7 +7,8 @@ Status: Try Counter and todo overlay With customized header + size + shape + dra
 3. [Done] User can customize the shape and radius of the overlay app
 4. [Done] User can customize the height and width of the overlay app
 5. [Done] User can customize the dragging area of the overlay app
-6. 
-7. Update the usage so that user have to do less customization
-8. How to upload in the community
-9. Use it in a react native app
+6. Scroll in the main UI
+7. Content has cut off in the overlay
+8. Update the usage so that user have to do less customization
+9. How to upload in the community
+10. Use it in a react native app
