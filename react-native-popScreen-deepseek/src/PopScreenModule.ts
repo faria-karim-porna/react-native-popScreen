@@ -1,5 +1,5 @@
 import { NativeModules } from 'react-native';
-import { ReactArchitectureInfo } from './PopScreen.types';
+import { ReactArchitectureInfo, DragMode } from './PopScreen.types';
 
 const { PopScreen } = NativeModules;
 
@@ -16,6 +16,7 @@ export interface PopScreenNativeModule {
   setWindowRect(x?: number, y?: number, width?: number, height?: number): Promise<void>;
   setSizeConstraints(minWidth?: number, minHeight?: number, maxWidth?: number, maxHeight?: number): Promise<void>;
   setHandleDimensions(dragHandleHeightDp?: number, resizeHandleSizeDp?: number): Promise<void>;
+  setDragMode(mode?: number): Promise<void>;
 }
 
 const DEFAULT_MIN_SIZE = 150;
@@ -39,6 +40,7 @@ const rawModule = PopScreen ?? {
   setWindowRect: async () => {},
   setSizeConstraints: async () => {},
   setHandleDimensions: async () => {},
+  setDragMode: async () => {},
 };
 
 /**
@@ -67,5 +69,17 @@ export const PopScreenModule: PopScreenNativeModule = {
       dragHandleHeightDp ?? DEFAULT_DRAG_HANDLE_DP,
       resizeHandleSizeDp ?? DEFAULT_RESIZE_HANDLE_DP
     ) ?? Promise.resolve(),
+  setDragMode: (mode) => rawModule.setDragMode?.(mode ?? DRAG_MODE.BAND) ?? Promise.resolve(),
 };
+
+/**
+ * Native drag interceptor modes. Mirrors OverlayService.kt `DRAG_MODE_*`:
+ * 1 = top drag-handle band, 2 = whole body draggable.
+ */
+export const DRAG_MODE = { BAND: 1, BODY: 2 } as const;
+
+/** Maps the public `DragMode` string to the native interceptor mode. */
+export function resolveDragMode(mode?: DragMode): number {
+  return mode === 'body' ? DRAG_MODE.BODY : DRAG_MODE.BAND;
+}
 

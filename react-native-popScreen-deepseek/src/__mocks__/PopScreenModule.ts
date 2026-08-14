@@ -16,6 +16,7 @@ const PopScreenModuleMock = {
   setWindowRect: jest.fn().mockResolvedValue(undefined),
   setSizeConstraints: jest.fn().mockResolvedValue(undefined),
   setHandleDimensions: jest.fn().mockResolvedValue(undefined),
+  setDragMode: jest.fn().mockResolvedValue(undefined),
 
   addListener: jest.fn((eventName: string, listener: Function) => {
     if (!listeners[eventName]) listeners[eventName] = new Set();

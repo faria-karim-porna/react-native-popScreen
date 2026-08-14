@@ -1,9 +1,15 @@
 import React from 'react';
 import { View, Text, Pressable, StyleSheet } from 'react-native';
 import { usePopScreen } from '../src/usePopScreen';
-import { OverlayShape } from '../src/PopScreen.types';
+import { OverlayShape, DragMode } from '../src/PopScreen.types';
 
 const SHAPES: OverlayShape[] = ['rounded', 'circle', 'square', 'pill', 'rectangle'];
+
+const DRAG_MODES: { label: string; value: DragMode }[] = [
+  { label: 'Top strip', value: 'handle' },
+  { label: 'Header', value: 'header' },
+  { label: 'Whole body', value: 'body' },
+];
 
 const RADIUS_OPTIONS = [
   { label: 'Default', value: undefined },
@@ -25,6 +31,7 @@ export default function OverlayCustomizerPanel() {
   const [radius, setRadius] = usePopScreen<number | undefined>('overlayRadius', undefined);
   const [width, setWidth] = usePopScreen<number | undefined>('overlayWidth', undefined);
   const [height, setHeight] = usePopScreen<number | undefined>('overlayHeight', undefined);
+  const [dragMode, setDragMode] = usePopScreen<DragMode>('overlayDragMode', 'handle');
 
   const applySize = (w?: number, h?: number) => {
     setWidth(w);
@@ -84,6 +91,22 @@ export default function OverlayCustomizerPanel() {
             </Pressable>
           );
         })}
+      </View>
+
+      {/* Drag Mode Selector */}
+      <Text style={styles.subtitle}>Drag From:</Text>
+      <View style={styles.buttonRow}>
+        {DRAG_MODES.map((opt) => (
+          <Pressable
+            key={opt.value}
+            style={[styles.chip, dragMode === opt.value && styles.chipActive]}
+            onPress={() => setDragMode(opt.value)}
+          >
+            <Text style={[styles.chipText, dragMode === opt.value && styles.chipTextActive]}>
+              {opt.label}
+            </Text>
+          </Pressable>
+        ))}
       </View>
     </View>
   );

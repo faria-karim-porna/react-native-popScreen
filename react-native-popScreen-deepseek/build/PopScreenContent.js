@@ -12,14 +12,32 @@ const PopScreenHeader_1 = __importDefault(require("./PopScreenHeader"));
 /**
  * Wraps whatever arbitrary RN content the developer wants shown in the
  * floating overlay. Also accepts optional config props that propagate
- * to the native interceptor's touch regions and header customization options.
+ * to the native interceptor's touch regions, window rect, constraints, shape, and radius options.
  */
-function PopScreenContent({ children, dragHandleHeight, resizeHandleSize, showHeader = false, header, headerProps, style, }) {
+function PopScreenContent({ children, dragHandleHeight, resizeHandleSize, showHeader = false, header, headerProps, dragMode, shape, borderRadius, width, height, minWidth, minHeight, maxWidth, maxHeight, style, }) {
+    // In 'header' mode the drag strip matches the header height (default 40dp)
+    // unless the caller explicitly overrides it via dragHandleHeight.
+    const effectiveDragHandleHeight = dragMode === 'header' ? (dragHandleHeight !== null && dragHandleHeight !== void 0 ? dragHandleHeight : DEFAULT_HEADER_HEIGHT_DP) : dragHandleHeight;
     (0, react_1.useEffect)(() => {
-        if (dragHandleHeight !== undefined || resizeHandleSize !== undefined) {
-            PopScreenModule_1.PopScreenModule.setHandleDimensions(dragHandleHeight, resizeHandleSize);
+        if (effectiveDragHandleHeight !== undefined || resizeHandleSize !== undefined) {
+            PopScreenModule_1.PopScreenModule.setHandleDimensions(effectiveDragHandleHeight, resizeHandleSize);
         }
-    }, [dragHandleHeight, resizeHandleSize]);
+    }, [effectiveDragHandleHeight, resizeHandleSize]);
+    (0, react_1.useEffect)(() => {
+        if (dragMode !== undefined) {
+            PopScreenModule_1.PopScreenModule.setDragMode((0, PopScreenModule_1.resolveDragMode)(dragMode));
+        }
+    }, [dragMode]);
+    (0, react_1.useEffect)(() => {
+        if (width !== undefined || height !== undefined) {
+            PopScreenModule_1.PopScreenModule.setWindowRect(undefined, undefined, width, height);
+        }
+    }, [width, height]);
+    (0, react_1.useEffect)(() => {
+        if (minWidth !== undefined || minHeight !== undefined || maxWidth !== undefined || maxHeight !== undefined) {
+            PopScreenModule_1.PopScreenModule.setSizeConstraints(minWidth, minHeight, maxWidth, maxHeight);
+        }
+    }, [minWidth, minHeight, maxWidth, maxHeight]);
     const renderHeader = () => {
         if (!showHeader && !header)
             return null;
@@ -27,11 +45,46 @@ function PopScreenContent({ children, dragHandleHeight, resizeHandleSize, showHe
             return header;
         return (0, jsx_runtime_1.jsx)(PopScreenHeader_1.default, { ...headerProps });
     };
-    return ((0, jsx_runtime_1.jsxs)(react_native_1.View, { style: [styles.container, style], children: [renderHeader(), children] }));
+    const getComputedShapeStyle = () => {
+        const effectiveShape = shape !== null && shape !== void 0 ? shape : (borderRadius !== undefined ? 'rounded' : 'rounded');
+        let defaultRadius = 16;
+        let aspectRatio = undefined;
+        switch (effectiveShape) {
+            case 'circle':
+                defaultRadius = 9999;
+                aspectRatio = 1;
+                break;
+            case 'pill':
+                defaultRadius = 9999;
+                break;
+            case 'square':
+                defaultRadius = 0;
+                aspectRatio = 1;
+                break;
+            case 'rectangle':
+                defaultRadius = 0;
+                break;
+            case 'rounded':
+            default:
+                defaultRadius = 16;
+                break;
+        }
+        const computedRadius = borderRadius !== null && borderRadius !== void 0 ? borderRadius : defaultRadius;
+        return {
+            borderRadius: computedRadius,
+            overflow: 'hidden',
+            ...(aspectRatio !== undefined ? { aspectRatio } : {}),
+            ...(width !== undefined ? { width } : {}),
+            ...(height !== undefined ? { height } : {}),
+        };
+    };
+    return ((0, jsx_runtime_1.jsxs)(react_native_1.View, { style: [styles.container, getComputedShapeStyle(), style], children: [renderHeader(), children] }));
 }
 const styles = react_native_1.StyleSheet.create({
     container: {
         flex: 1,
     },
 });
+/** Default height of the built-in PopScreenHeader (dp). */
+const DEFAULT_HEADER_HEIGHT_DP = 40;
 //# sourceMappingURL=PopScreenContent.js.map

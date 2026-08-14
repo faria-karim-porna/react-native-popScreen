@@ -8,6 +8,7 @@ jest.mock('react-native', () => ({
       setHandleDimensions: jest.fn().mockResolvedValue(undefined),
       setWindowRect: jest.fn().mockResolvedValue(undefined),
       setSizeConstraints: jest.fn().mockResolvedValue(undefined),
+      setDragMode: jest.fn().mockResolvedValue(undefined),
     },
   },
   Platform: { OS: 'android', Version: 30, select: (obj: any) => obj.android ?? obj.default },
@@ -57,12 +58,14 @@ import PopScreenContent from '../PopScreenContent';
 const mockSetHandleDimensions = NativeModules.PopScreen.setHandleDimensions;
 const mockSetWindowRect = NativeModules.PopScreen.setWindowRect;
 const mockSetSizeConstraints = NativeModules.PopScreen.setSizeConstraints;
+const mockSetDragMode = NativeModules.PopScreen.setDragMode;
 
 describe('PopScreenContent', () => {
   beforeEach(() => {
     mockSetHandleDimensions.mockClear();
     mockSetWindowRect.mockClear();
     mockSetSizeConstraints.mockClear();
+    mockSetDragMode.mockClear();
   });
 
   it('calls setHandleDimensions when dragHandleHeight prop is provided', () => {
@@ -84,6 +87,48 @@ describe('PopScreenContent', () => {
       create(<PopScreenContent><></></PopScreenContent>);
     });
     expect(mockSetHandleDimensions).not.toHaveBeenCalled();
+  });
+
+  it('does not call setDragMode when dragMode is not provided', () => {
+    act(() => {
+      create(<PopScreenContent><></></PopScreenContent>);
+    });
+    expect(mockSetDragMode).not.toHaveBeenCalled();
+  });
+
+  it('calls setDragMode with the body mode when dragMode is "body"', () => {
+    act(() => {
+      create(<PopScreenContent dragMode="body"><></></PopScreenContent>);
+    });
+    expect(mockSetDragMode).toHaveBeenCalledWith(2);
+  });
+
+  it('calls setDragMode with the band mode when dragMode is "handle"', () => {
+    act(() => {
+      create(<PopScreenContent dragMode="handle"><></></PopScreenContent>);
+    });
+    expect(mockSetDragMode).toHaveBeenCalledWith(1);
+  });
+
+  it('calls setDragMode with the band mode when dragMode is "header"', () => {
+    act(() => {
+      create(<PopScreenContent dragMode="header"><></></PopScreenContent>);
+    });
+    expect(mockSetDragMode).toHaveBeenCalledWith(1);
+  });
+
+  it('auto-sizes the drag strip to the header height in header mode', () => {
+    act(() => {
+      create(<PopScreenContent dragMode="header"><></></PopScreenContent>);
+    });
+    expect(mockSetHandleDimensions).toHaveBeenCalledWith(40, 24);
+  });
+
+  it('respects dragHandleHeight override in header mode', () => {
+    act(() => {
+      create(<PopScreenContent dragMode="header" dragHandleHeight={60}><></></PopScreenContent>);
+    });
+    expect(mockSetHandleDimensions).toHaveBeenCalledWith(60, 24);
   });
 
   it('calls setWindowRect when width or height props are provided', () => {

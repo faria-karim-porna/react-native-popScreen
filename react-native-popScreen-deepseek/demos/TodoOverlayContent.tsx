@@ -35,7 +35,7 @@ const DEFAULT_TODOS: TodoItem[] = [];
  *  - This Todo demo      → shared `array` (objects) state
  *  - Input Submit demo   → purely LOCAL `useState` (does not leak)
  */
-export default function TodoOverlayContent({ shape, borderRadius, width, height }: OverlayDemoProps = {}) {
+export default function TodoOverlayContent({ shape, borderRadius, width, height, dragMode }: OverlayDemoProps = {}) {
   const [todos, setTodos] = usePopScreen<TodoItem[]>('todos', DEFAULT_TODOS);
   const [draft, setDraft] = useState('');
 
@@ -60,16 +60,14 @@ export default function TodoOverlayContent({ shape, borderRadius, width, height 
 
   return (
     /**
-     * dragHandleHeight={0} disables the native drag-handle touch interceptor
-     * at the top of the window. Without this, the native OverlayTouchContainer
-     * steals ACTION_DOWN events in the top 32dp band, preventing the header's
-     * Cancel and Back to Main App Pressable buttons from receiving taps.
-     *
-     * The overlay can still be dragged by the user grabbing the bottom part of
-     * the header or any other non-interactive area if a resize/drag gesture is
-     * set up, but the button tap area is now fully handed to React Native.
+     * With dragMode="header" (see the customizer panel) the whole header is
+     * draggable. The native touch interceptor uses deferred (touch-slop)
+     * interception, so taps on the header's Cancel / Back to Main App buttons
+     * still land on the buttons while a real drag gesture moves the window —
+     * unlike the old intercept-on-down behavior, which required disabling the
+     * drag handle entirely (dragHandleHeight={0}).
      */
-    <PopScreenContent dragHandleHeight={0} shape={shape} borderRadius={borderRadius} width={width} height={height}>
+    <PopScreenContent dragMode={dragMode} shape={shape} borderRadius={borderRadius} width={width} height={height}>
       <View style={[styles.container, borderRadius !== undefined && { borderRadius }]}>
         {/* Header lives inside the dark rounded container */}
         <PopScreenHeader title="Todo List" />

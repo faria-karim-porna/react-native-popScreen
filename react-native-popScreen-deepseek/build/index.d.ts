@@ -1,4 +1,4 @@
-import { DragUpdateEvent, ResizeUpdateEvent, WindowStateChangeEvent, PermissionResultEvent } from './PopScreen.types';
+import { DragUpdateEvent, ResizeUpdateEvent, WindowStateChangeEvent, PermissionResultEvent, DragMode } from './PopScreen.types';
 export declare function hasOverlayPermission(): Promise<boolean>;
 export declare function requestOverlayPermission(): Promise<void>;
 export declare function hasBatteryOptimizationExemption(): Promise<boolean>;
@@ -22,6 +22,11 @@ export declare function addPermissionResultListener(listener: (event: Permission
 };
 export declare function setWindowRect(x?: number, y?: number, width?: number, height?: number): Promise<void>;
 export declare function setSizeConstraints(minWidth?: number, minHeight?: number, maxWidth?: number, maxHeight?: number): Promise<void>;
+/**
+ * Sets where the overlay window can be dragged from: a top drag-handle
+ * strip ('handle'), the header only ('header'), or the whole body ('body').
+ */
+export declare function setDragMode(mode: DragMode): Promise<void>;
 export { minimize, restore, getIsMinimized } from './minimizeRestore';
 export { default as PopScreenContent } from './PopScreenContent';
 export { default as PopScreenHeader } from './PopScreenHeader';

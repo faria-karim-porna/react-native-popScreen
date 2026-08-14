@@ -33,6 +33,7 @@ exports.addWindowStateChangeListener = addWindowStateChangeListener;
 exports.addPermissionResultListener = addPermissionResultListener;
 exports.setWindowRect = setWindowRect;
 exports.setSizeConstraints = setSizeConstraints;
+exports.setDragMode = setDragMode;
 const PopScreenModule_1 = require("./PopScreenModule");
 const react_native_1 = require("react-native");
 const { PopScreen } = react_native_1.NativeModules;
@@ -92,6 +93,14 @@ async function setWindowRect(x, y, width, height) {
 }
 async function setSizeConstraints(minWidth, minHeight, maxWidth, maxHeight) {
     return PopScreenModule_1.PopScreenModule.setSizeConstraints(minWidth, minHeight, maxWidth, maxHeight);
+}
+// ─── Drag configuration (Milestone 4) ────────────────────────────────
+/**
+ * Sets where the overlay window can be dragged from: a top drag-handle
+ * strip ('handle'), the header only ('header'), or the whole body ('body').
+ */
+async function setDragMode(mode) {
+    return PopScreenModule_1.PopScreenModule.setDragMode((0, PopScreenModule_1.resolveDragMode)(mode));
 }
 // ─── Minimize / Restore ──────────────────────────────────────────────
 var minimizeRestore_1 = require("./minimizeRestore");

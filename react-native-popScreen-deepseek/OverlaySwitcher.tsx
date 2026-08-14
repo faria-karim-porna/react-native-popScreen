@@ -3,7 +3,7 @@ import { usePopScreen } from './src/usePopScreen';
 import CounterOverlayContent from './demos/CounterOverlayContent';
 import InputSubmitOverlayContent from './demos/InputSubmitOverlayContent';
 import TodoOverlayContent from './demos/TodoOverlayContent';
-import { OverlayShape } from './src/PopScreen.types';
+import { OverlayShape, DragMode } from './src/PopScreen.types';
 
 export default function OverlaySwitcher() {
   const [activeDemo] = usePopScreen<string>('activeDemo', 'counter');
@@ -11,12 +11,13 @@ export default function OverlaySwitcher() {
   const [borderRadius] = usePopScreen<number | undefined>('overlayRadius', undefined);
   const [width] = usePopScreen<number | undefined>('overlayWidth', undefined);
   const [height] = usePopScreen<number | undefined>('overlayHeight', undefined);
+  const [dragMode] = usePopScreen<DragMode>('overlayDragMode', 'handle');
 
   if (activeDemo === 'inputSubmit') {
-    return <InputSubmitOverlayContent shape={shape} borderRadius={borderRadius} width={width} height={height} />;
+    return <InputSubmitOverlayContent shape={shape} borderRadius={borderRadius} width={width} height={height} dragMode={dragMode} />;
   }
   if (activeDemo === 'todo') {
-    return <TodoOverlayContent shape={shape} borderRadius={borderRadius} width={width} height={height} />;
+    return <TodoOverlayContent shape={shape} borderRadius={borderRadius} width={width} height={height} dragMode={dragMode} />;
   }
-  return <CounterOverlayContent shape={shape} borderRadius={borderRadius} width={width} height={height} />;
+  return <CounterOverlayContent shape={shape} borderRadius={borderRadius} width={width} height={height} dragMode={dragMode} />;
 }

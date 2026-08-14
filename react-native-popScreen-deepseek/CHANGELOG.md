@@ -5,6 +5,16 @@ All notable changes to PopScreen will be documented in this file.
 The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.1.0/),
 and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0.html).
 
+## [Unreleased]
+
+### Added
+- `PopScreenContent` `dragMode` prop (`'handle' | 'header' | 'body'`) and
+  `setDragMode()` API — choose whether the overlay is dragged from the top
+  drag-handle strip, the header only, or the whole body.
+- Native drag interception now uses deferred (touch-slop) interception: taps
+  inside the drag region (header buttons, text fields) pass through to the
+  content, and the window only starts dragging once the finger actually moves.
+
 ## [1.0.0] — 2026-07-07
 
 ### Added

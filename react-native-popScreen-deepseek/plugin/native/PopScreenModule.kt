@@ -187,6 +187,11 @@ class PopScreenModule(private val reactContext: ReactApplicationContext) :
     )
   }
 
+  @ReactMethod
+  fun setDragMode(mode: Double) {
+    OverlayService.setDragMode(mode.toInt())
+  }
+
   // ── Internal event emitters (also callable from OverlayService) ─────
 
   private fun emitWindowStateInternal(state: String, reason: String?) {

@@ -1,5 +1,13 @@
 export type OverlayShape = 'rectangle' | 'rounded' | 'circle' | 'square' | 'pill';
 
+/**
+ * Where the overlay window can be dragged from:
+ * - `'handle'` — a top drag-handle strip sized by `dragHandleHeight` (default 32dp).
+ * - `'header'` — only the header is draggable (band auto-matches the header height, default 40dp).
+ * - `'body'`   — the whole overlay body is draggable (bottom-right resize corner still works).
+ */
+export type DragMode = 'handle' | 'header' | 'body';
+
 export type ReactArchitecture = 'NEW_ARCHITECTURE' | 'OLD_ARCHITECTURE' | 'UNKNOWN';
 
 export type ReactArchitectureInfo = {

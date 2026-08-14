@@ -41,15 +41,31 @@ Sets the window's position and/or size directly. Any parameter may be omitted.
 ### `setSizeConstraints(minWidth?, minHeight?, maxWidth?, maxHeight?): Promise<void>`
 Sets limits on how small or large the window may be during user resize (defaults: min 150×150).
 
+### `setDragMode(mode): Promise<void>`
+Sets where the overlay window can be dragged from:
+- `'handle'` — a top drag-handle strip (default; height from `dragHandleHeight`).
+- `'header'` — only the header is draggable.
+- `'body'` — the whole overlay body is draggable.
+
+The bottom-right resize corner keeps working in every mode.
+
 ## Configuration & Header
 
-### `<PopScreenContent dragHandleHeight? resizeHandleSize? showHeader? header? headerProps?>`
+### `<PopScreenContent dragHandleHeight? resizeHandleSize? dragMode? showHeader? header? headerProps?>`
 Wraps your overlay UI.
-- `dragHandleHeight` (dp): Overrides the native drag-handle region height.
-- `resizeHandleSize` (dp): Overrides the bottom-right resize handle target size.
+- `dragHandleHeight` (dp): Height of the top drag-handle strip in `'handle'` mode (default: 32).
+- `resizeHandleSize` (dp): Overrides the bottom-right resize handle target size (default: 24).
+- `dragMode` (`'handle' | 'header' | 'body'`): Where the overlay can be dragged from
+  (default: `'handle'`). `'header'` drags only from the header and auto-sizes the
+  strip to the header height (default 40dp, overridable via `dragHandleHeight`);
+  `'body'` makes the whole overlay body draggable.
 - `showHeader` (boolean): Shows or hides the header in the overlay (default: `false`).
 - `header` (ReactNode): Custom header element (overrides default `<PopScreenHeader />`).
 - `headerProps`: Props passed to default `<PopScreenHeader />`.
+
+> Taps in the drag region (header buttons, text fields, …) still pass through to
+> the content — the window only starts dragging once the finger moves past touch
+> slop.
 
 ### `<PopScreenHeader title? onCancel? onBackToApp? showCancel? showBackToApp?>`
 Configurable React Native overlay header. Includes **Cancel** (hides overlay) and **Back to Main App** (launches host app and hides overlay) buttons by default.

@@ -1,13 +1,23 @@
 import React, { useEffect } from 'react';
 import { View, StyleSheet, StyleProp, ViewStyle } from 'react-native';
-import { PopScreenModule } from './PopScreenModule';
+import { PopScreenModule, resolveDragMode } from './PopScreenModule';
 import PopScreenHeader, { PopScreenHeaderProps } from './PopScreenHeader';
-import { OverlayShape } from './PopScreen.types';
+import { OverlayShape, DragMode } from './PopScreen.types';
 
 export interface PopScreenContentProps {
   children?: React.ReactNode;
+  /** Height of the top drag-handle strip in dp when `dragMode` is 'handle' (default: 32) */
   dragHandleHeight?: number;
+  /** Bottom-right resize handle target size in dp (default: 24) */
   resizeHandleSize?: number;
+  /**
+   * Where the overlay can be dragged from (default: 'handle').
+   * - 'handle': a top strip sized by `dragHandleHeight`.
+   * - 'header': only the header is draggable — the strip auto-matches the
+   *   header height (default 40dp) unless `dragHandleHeight` overrides it.
+   * - 'body': the whole overlay body is draggable.
+   */
+  dragMode?: DragMode;
   /** Whether to show the overlay header (default: false) */
   showHeader?: boolean;
   /** Custom header element to render (overrides default PopScreenHeader) */
@@ -46,6 +56,7 @@ export default function PopScreenContent({
   showHeader = false,
   header,
   headerProps,
+  dragMode,
   shape,
   borderRadius,
   width,
@@ -56,11 +67,22 @@ export default function PopScreenContent({
   maxHeight,
   style,
 }: PopScreenContentProps) {
+  // In 'header' mode the drag strip matches the header height (default 40dp)
+  // unless the caller explicitly overrides it via dragHandleHeight.
+  const effectiveDragHandleHeight =
+    dragMode === 'header' ? (dragHandleHeight ?? DEFAULT_HEADER_HEIGHT_DP) : dragHandleHeight;
+
   useEffect(() => {
-    if (dragHandleHeight !== undefined || resizeHandleSize !== undefined) {
-      PopScreenModule.setHandleDimensions(dragHandleHeight, resizeHandleSize);
+    if (effectiveDragHandleHeight !== undefined || resizeHandleSize !== undefined) {
+      PopScreenModule.setHandleDimensions(effectiveDragHandleHeight, resizeHandleSize);
     }
-  }, [dragHandleHeight, resizeHandleSize]);
+  }, [effectiveDragHandleHeight, resizeHandleSize]);
+
+  useEffect(() => {
+    if (dragMode !== undefined) {
+      PopScreenModule.setDragMode(resolveDragMode(dragMode));
+    }
+  }, [dragMode]);
 
   useEffect(() => {
     if (width !== undefined || height !== undefined) {
@@ -130,3 +152,6 @@ const styles = StyleSheet.create({
     flex: 1,
   },
 });
+
+/** Default height of the built-in PopScreenHeader (dp). */
+const DEFAULT_HEADER_HEIGHT_DP = 40;

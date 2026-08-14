@@ -16,23 +16,24 @@ import { usePopScreen } from '../src/usePopScreen';
  * because they share the same JS process.
  *
  * Counter overlay is intentionally headerless — the native drag-handle
- * region (top 32dp) is kept so the entire top strip can be used to drag
- * the window.
+ * region (top 32dp by default) is kept so the entire top strip can be
+ * used to drag the window. Set `dragMode="body"` to drag from anywhere.
  */
-import { OverlayShape } from '../src/PopScreen.types';
+import { OverlayShape, DragMode } from '../src/PopScreen.types';
 
 export interface OverlayDemoProps {
   shape?: OverlayShape;
   borderRadius?: number;
   width?: number;
   height?: number;
+  dragMode?: DragMode;
 }
 
-export default function CounterOverlayContent({ shape, borderRadius, width, height }: OverlayDemoProps = {}) {
+export default function CounterOverlayContent({ shape, borderRadius, width, height, dragMode }: OverlayDemoProps = {}) {
   const [count, setCount] = usePopScreen<number>('count', 0);
 
   return (
-    <PopScreenContent shape={shape} borderRadius={borderRadius} width={width} height={height}>
+    <PopScreenContent shape={shape} borderRadius={borderRadius} width={width} height={height} dragMode={dragMode}>
       <View style={styles.container}>
         <View style={styles.content}>
           <Text style={styles.countText}>{count}</Text>

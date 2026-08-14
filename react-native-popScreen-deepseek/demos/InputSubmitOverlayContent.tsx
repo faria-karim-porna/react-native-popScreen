@@ -25,7 +25,7 @@ import PopScreenContent from '../src/PopScreenContent';
  */
 import { OverlayDemoProps } from './CounterOverlayContent';
 
-export default function InputSubmitOverlayContent({ shape, borderRadius, width, height }: OverlayDemoProps = {}) {
+export default function InputSubmitOverlayContent({ shape, borderRadius, width, height, dragMode }: OverlayDemoProps = {}) {
   const [draft, setDraft] = useState('');
   const [submissions, setSubmissions] = useState<string[]>([]);
 
@@ -37,7 +37,7 @@ export default function InputSubmitOverlayContent({ shape, borderRadius, width, 
   };
 
   return (
-    <PopScreenContent shape={shape} borderRadius={borderRadius} width={width} height={height}>
+    <PopScreenContent shape={shape} borderRadius={borderRadius} width={width} height={height} dragMode={dragMode}>
       <View style={styles.container}>
         <View style={styles.content}>
           <View style={styles.inputRow}>

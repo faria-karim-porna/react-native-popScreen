@@ -51,6 +51,10 @@ class OverlayService : Service() {
     const val DEFAULT_DRAG_HANDLE_DP = 32
     const val DEFAULT_RESIZE_HANDLE_DP = 24
 
+    // Where the window can be dragged from. Pushed from the JS module.
+    const val DRAG_MODE_BAND = 1 // top drag-handle band
+    const val DRAG_MODE_BODY = 2 // whole overlay body
+
     // Config pushed from the JS module (same process).
     private var pendingRect: Rect? = null
     private var minWidth = DEFAULT_MIN_SIZE
@@ -59,6 +63,7 @@ class OverlayService : Service() {
     private var maxHeight = 0
     private var dragHandleHeightDp = DEFAULT_DRAG_HANDLE_DP
     private var resizeHandleSizeDp = DEFAULT_RESIZE_HANDLE_DP
+    private var dragMode = DRAG_MODE_BAND
 
     @Volatile
     private var instance: OverlayService? = null
@@ -90,6 +95,11 @@ class OverlayService : Service() {
     fun setHandleDimensions(dragDp: Int, resizeDp: Int) {
       dragHandleHeightDp = dragDp
       resizeHandleSizeDp = resizeDp
+      instance?.mainHandler?.post { instance?.syncGestureParams() }
+    }
+
+    fun setDragMode(mode: Int) {
+      dragMode = mode
       instance?.mainHandler?.post { instance?.syncGestureParams() }
     }
   }
@@ -242,6 +252,7 @@ class OverlayService : Service() {
       )
     )
     containerView.setGestureParams(
+      dragMode = dragMode,
       dragHandlePx = dp(dragHandleHeightDp),
       resizeHandlePx = dp(resizeHandleSizeDp),
       minWidthPx = dp(minWidth),
@@ -738,6 +749,7 @@ class OverlayService : Service() {
   private fun syncGestureParams() {
     val cv = container ?: return
     cv.setGestureParams(
+      dragMode = dragMode,
       dragHandlePx = dp(dragHandleHeightDp),
       resizeHandlePx = dp(resizeHandleSizeDp),
       minWidthPx = dp(minWidth),
@@ -749,12 +761,20 @@ class OverlayService : Service() {
 }
 
 /**
- * Touch interceptor that turns the top drag-handle band into a window-drag
- * gesture and the bottom-right corner into a resize gesture. Touches outside
- * those regions fall through to the React Native content underneath.
+ * Touch interceptor that turns a drag region (the top drag-handle band or the
+ * whole body — see [setGestureParams]) into a window-drag gesture and the
+ * bottom-right corner into a resize gesture. Touches outside those regions
+ * fall through to the React Native content underneath.
+ *
+ * Drag regions use deferred interception: a tap (no movement past touch slop)
+ * passes through to the content underneath, so interactive elements such as
+ * header buttons or text fields inside the drag region stay clickable. The
+ * gesture is only stolen once the finger actually moves — that is when the
+ * window starts to drag.
  */
 class OverlayTouchContainer(context: Context) : FrameLayout(context) {
 
+  private var dragMode = OverlayService.DRAG_MODE_BAND
   private var dragHandlePx = 0
   private var resizeHandlePx = 0
   private var minWidthPx = 0
@@ -776,11 +796,14 @@ class OverlayTouchContainer(context: Context) : FrameLayout(context) {
   var onOutsideTouch: ((ev: MotionEvent) -> Unit)? = null
 
   private var mode = 0 // 0 none, 1 drag, 2 resize
+  private var downX = 0f
+  private var downY = 0f
   private var lastX = 0f
   private var lastY = 0f
   private var started = false
 
   fun setGestureParams(
+    dragMode: Int,
     dragHandlePx: Int,
     resizeHandlePx: Int,
     minWidthPx: Int,
@@ -788,6 +811,7 @@ class OverlayTouchContainer(context: Context) : FrameLayout(context) {
     maxWidthPx: Int,
     maxHeightPx: Int
   ) {
+    this.dragMode = dragMode
     this.dragHandlePx = dragHandlePx
     this.resizeHandlePx = resizeHandlePx
     this.minWidthPx = minWidthPx
@@ -796,35 +820,61 @@ class OverlayTouchContainer(context: Context) : FrameLayout(context) {
     this.maxHeightPx = maxHeightPx
   }
 
-  // Only the ACTION_DOWN decides interception. Once intercepted, Android
-  // routes the rest of the gesture (MOVE/UP) straight to onTouchEvent —
-  // onInterceptTouchEvent is NOT called again for the same gesture.
+  /**
+   * Only the ACTION_DOWN decides the gesture region; drag regions defer
+   * interception until the finger moves past touch slop. Once intercepted,
+   * Android routes the rest of the gesture (MOVE/UP) straight to
+   * onTouchEvent — onInterceptTouchEvent is NOT called again for the same
+   * gesture.
+   */
   override fun onInterceptTouchEvent(ev: MotionEvent): Boolean {
-    if (ev.actionMasked == MotionEvent.ACTION_DOWN) {
-      val x = ev.x
-      val y = ev.y
-      val w = width
-      val h = height
-      return when {
-        dragHandlePx > 0 && y <= dragHandlePx -> {
-          mode = 1
-          lastX = x
-          lastY = y
-          started = false
-          true
-        }
-        resizeHandlePx > 0 && x >= w - resizeHandlePx && y >= h - resizeHandlePx -> {
+    when (ev.actionMasked) {
+      MotionEvent.ACTION_DOWN -> {
+        val x = ev.x
+        val y = ev.y
+        val w = width
+        val h = height
+        // The resize corner always steals the touch immediately — it is a
+        // dedicated handle with no interactive content underneath.
+        if (resizeHandlePx > 0 && x >= w - resizeHandlePx && y >= h - resizeHandlePx) {
           mode = 2
           lastX = x
           lastY = y
+          started = true
+          return true
+        }
+        val inDragRegion = when (dragMode) {
+          OverlayService.DRAG_MODE_BODY -> true
+          OverlayService.DRAG_MODE_BAND -> dragHandlePx > 0 && y <= dragHandlePx
+          else -> false
+        }
+        if (inDragRegion) {
+          mode = 1
+          downX = x
+          downY = y
+          lastX = x
+          lastY = y
           started = false
-          true
+          // In whole-body mode every touch is also content, so keyboard/focus
+          // handling still runs on taps (text fields keep working).
+          if (dragMode == OverlayService.DRAG_MODE_BODY) onContentTouch?.invoke(x, y)
+          return false
         }
-        else -> {
-          mode = 0
-          onContentTouch?.invoke(ev.x, ev.y)
-          false
+        mode = 0
+        onContentTouch?.invoke(x, y)
+        return false
+      }
+      MotionEvent.ACTION_MOVE -> {
+        // Steal the gesture once the finger has moved past touch slop.
+        if (mode == 1 && !started &&
+          (Math.abs(ev.x - downX) > touchSlop() || Math.abs(ev.y - downY) > touchSlop())
+        ) {
+          started = true
+          lastX = ev.x
+          lastY = ev.y
+          return true
         }
+        return false
       }
     }
     return false
@@ -851,16 +901,13 @@ class OverlayTouchContainer(context: Context) : FrameLayout(context) {
     if (mode == 0) return false
     when (ev.actionMasked) {
       MotionEvent.ACTION_MOVE -> {
+        // The gesture is always 'started' by the time it reaches here (the
+        // resize corner intercepts on DOWN, drag regions only after moving
+        // past touch slop), so every MOVE is a real drag/resize delta.
+        if (!started) return true
         val dx = (ev.x - lastX).toInt()
         val dy = (ev.y - lastY).toInt()
-        if (!started &&
-          (Math.abs(ev.x - lastX) > touchSlop() || Math.abs(ev.y - lastY) > touchSlop())
-        ) {
-          started = true
-        }
-        if (started) {
-          if (mode == 1) onDrag?.invoke(dx, dy) else onResize?.invoke(dx, dy)
-        }
+        if (mode == 1) onDrag?.invoke(dx, dy) else onResize?.invoke(dx, dy)
         lastX = ev.x
         lastY = ev.y
       }

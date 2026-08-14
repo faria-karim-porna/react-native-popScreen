@@ -1,6 +1,7 @@
 "use strict";
 Object.defineProperty(exports, "__esModule", { value: true });
-exports.PopScreenModule = void 0;
+exports.DRAG_MODE = exports.PopScreenModule = void 0;
+exports.resolveDragMode = resolveDragMode;
 const react_native_1 = require("react-native");
 const { PopScreen } = react_native_1.NativeModules;
 const DEFAULT_MIN_SIZE = 150;
@@ -23,6 +24,7 @@ const rawModule = PopScreen !== null && PopScreen !== void 0 ? PopScreen : {
     setWindowRect: async () => { },
     setSizeConstraints: async () => { },
     setHandleDimensions: async () => { },
+    setDragMode: async () => { },
 };
 /**
  * The native PopScreen module wrapper.
@@ -43,5 +45,15 @@ exports.PopScreenModule = {
         var _a, _b;
         return (_b = (_a = rawModule.setHandleDimensions) === null || _a === void 0 ? void 0 : _a.call(rawModule, dragHandleHeightDp !== null && dragHandleHeightDp !== void 0 ? dragHandleHeightDp : DEFAULT_DRAG_HANDLE_DP, resizeHandleSizeDp !== null && resizeHandleSizeDp !== void 0 ? resizeHandleSizeDp : DEFAULT_RESIZE_HANDLE_DP)) !== null && _b !== void 0 ? _b : Promise.resolve();
     },
+    setDragMode: (mode) => { var _a, _b; return (_b = (_a = rawModule.setDragMode) === null || _a === void 0 ? void 0 : _a.call(rawModule, mode !== null && mode !== void 0 ? mode : exports.DRAG_MODE.BAND)) !== null && _b !== void 0 ? _b : Promise.resolve(); },
 };
+/**
+ * Native drag interceptor modes. Mirrors OverlayService.kt `DRAG_MODE_*`:
+ * 1 = top drag-handle band, 2 = whole body draggable.
+ */
+exports.DRAG_MODE = { BAND: 1, BODY: 2 };
+/** Maps the public `DragMode` string to the native interceptor mode. */
+function resolveDragMode(mode) {
+    return mode === 'body' ? exports.DRAG_MODE.BODY : exports.DRAG_MODE.BAND;
+}
 //# sourceMappingURL=PopScreenModule.js.map
