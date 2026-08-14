@@ -25,6 +25,8 @@ export interface PopScreenHeaderProps {
   cancelText?: string;
   /** Custom text for Back to Main App button (default: "Back to Main App") */
   backToAppText?: string;
+  /** Whether to force compact layout for small overlay widths */
+  compact?: boolean;
   /** Custom container style */
   style?: StyleProp<ViewStyle>;
   /** Custom title text style */
@@ -45,12 +47,21 @@ export default function PopScreenHeader({
   showBackToApp = true,
   cancelText = 'Cancel',
   backToAppText = 'Back to Main App',
+  compact,
   style,
   titleStyle,
   buttonStyle,
   buttonTextStyle,
   children,
 }: PopScreenHeaderProps) {
+  const [headerWidth, setHeaderWidth] = React.useState<number | undefined>(undefined);
+  const isNarrow = compact ?? (headerWidth !== undefined ? headerWidth < 280 : false);
+
+  const resolvedBackToAppText =
+    backToAppText === 'Back to Main App' && isNarrow ? 'Back' : backToAppText;
+  const resolvedCancelText =
+    cancelText === 'Cancel' && isNarrow && headerWidth !== undefined && headerWidth < 200 ? '✕' : cancelText;
+
   const handleCancel = () => {
     if (onCancel) {
       onCancel();
@@ -73,7 +84,15 @@ export default function PopScreenHeader({
   }
 
   return (
-    <View style={[styles.headerContainer, style]}>
+    <View
+      style={[styles.headerContainer, style]}
+      onLayout={(e) => {
+        const w = e.nativeEvent?.layout?.width;
+        if (w && w !== headerWidth) {
+          setHeaderWidth(w);
+        }
+      }}
+    >
       {showBackToApp ? (
         <Pressable
           style={({ pressed }) => [
@@ -84,11 +103,11 @@ export default function PopScreenHeader({
           ]}
           onPress={handleBackToApp}
           accessibilityRole="button"
-          accessibilityLabel={backToAppText}
+          accessibilityLabel={resolvedBackToAppText}
           testID="header-back-to-app-button"
         >
           <Text style={[styles.backButtonText, buttonTextStyle]} numberOfLines={1}>
-            {backToAppText}
+            {resolvedBackToAppText}
           </Text>
         </Pressable>
       ) : (
@@ -111,11 +130,11 @@ export default function PopScreenHeader({
           ]}
           onPress={handleCancel}
           accessibilityRole="button"
-          accessibilityLabel={cancelText}
+          accessibilityLabel={resolvedCancelText}
           testID="header-cancel-button"
         >
           <Text style={[styles.cancelButtonText, buttonTextStyle]} numberOfLines={1}>
-            {cancelText}
+            {resolvedCancelText}
           </Text>
         </Pressable>
       ) : (
@@ -127,7 +146,7 @@ export default function PopScreenHeader({
 
 const styles = StyleSheet.create({
   headerContainer: {
-    height: 40,
+    minHeight: 40,
     flexDirection: 'row',
     alignItems: 'center',
     justifyContent: 'space-between',
@@ -142,6 +161,7 @@ const styles = StyleSheet.create({
     borderRadius: 6,
     justifyContent: 'center',
     alignItems: 'center',
+    flexShrink: 0,
   },
   backButton: {
     backgroundColor: 'rgba(59, 130, 246, 0.2)',
@@ -165,10 +185,11 @@ const styles = StyleSheet.create({
     fontWeight: '700',
     textAlign: 'center',
     flex: 1,
+    flexShrink: 1,
     marginHorizontal: 4,
   },
   buttonPlaceholder: {
-    width: 60,
+    width: 44,
   },
   pressed: {
     opacity: 0.7,

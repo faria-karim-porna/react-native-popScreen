@@ -37,7 +37,7 @@ export default function InputSubmitOverlayContent({ shape, borderRadius, width, 
   };
 
   return (
-    <PopScreenContent shape={shape} borderRadius={borderRadius} width={width} height={height} dragMode={dragMode}>
+    <PopScreenContent shape={shape} borderRadius={borderRadius} width={width} height={height} dragMode={dragMode} scrollable={false}>
       <View style={styles.container}>
         <View style={styles.content}>
           <View style={styles.inputRow}>
@@ -57,12 +57,15 @@ export default function InputSubmitOverlayContent({ shape, borderRadius, width, 
 
           <FlatList
             style={styles.list}
+            contentContainerStyle={styles.listContent}
             data={submissions}
             keyExtractor={(item, index) => `${index}-${item}`}
             renderItem={({ item }) => (
               <Text style={styles.listItem}>• {item}</Text>
             )}
             ListEmptyComponent={<Text style={styles.emptyText}>No submissions yet</Text>}
+            nestedScrollEnabled={true}
+            keyboardShouldPersistTaps="handled"
           />
         </View>
       </View>
@@ -71,9 +74,9 @@ export default function InputSubmitOverlayContent({ shape, borderRadius, width, 
 }
 
 const styles = StyleSheet.create({
-  container: { flex: 1, backgroundColor: 'rgba(30,30,45,0.95)', borderRadius: 20, overflow: 'hidden' },
+  container: { flex: 1, backgroundColor: 'rgba(30,30,45,0.95)' },
   content: { flex: 1, padding: 10, gap: 8 },
-  inputRow: { flexDirection: 'row', gap: 8 },
+  inputRow: { flexDirection: 'row', gap: 8, alignItems: 'center' },
   input: {
     flex: 1,
     backgroundColor: 'rgba(255,255,255,0.1)',
@@ -81,10 +84,12 @@ const styles = StyleSheet.create({
     borderRadius: 8,
     paddingHorizontal: 10,
     paddingVertical: 6,
+    fontSize: 13,
   },
-  submitButton: { backgroundColor: '#60a5fa', borderRadius: 8, paddingHorizontal: 12, justifyContent: 'center' },
-  submitButtonText: { color: '#0a1a2e', fontWeight: '700' },
+  submitButton: { backgroundColor: '#60a5fa', borderRadius: 8, paddingHorizontal: 12, paddingVertical: 8, justifyContent: 'center' },
+  submitButtonText: { color: '#0a1a2e', fontWeight: '700', fontSize: 12 },
   list: { flex: 1, marginTop: 4 },
+  listContent: { paddingBottom: 8 },
   listItem: { color: '#cbd5e1', fontSize: 13, paddingVertical: 3 },
   emptyText: { color: '#666', fontSize: 12, fontStyle: 'italic' },
 });

@@ -67,9 +67,9 @@ export default function TodoOverlayContent({ shape, borderRadius, width, height,
      * unlike the old intercept-on-down behavior, which required disabling the
      * drag handle entirely (dragHandleHeight={0}).
      */
-    <PopScreenContent dragMode={dragMode} shape={shape} borderRadius={borderRadius} width={width} height={height}>
-      <View style={[styles.container, borderRadius !== undefined && { borderRadius }]}>
-        {/* Header lives inside the dark rounded container */}
+    <PopScreenContent dragMode={dragMode} shape={shape} borderRadius={borderRadius} width={width} height={height} scrollable={false}>
+      <View style={styles.container}>
+        {/* Header lives inside the dark container */}
         <PopScreenHeader title="Todo List" />
 
         <View style={styles.content}>
@@ -94,6 +94,7 @@ export default function TodoOverlayContent({ shape, borderRadius, width, height,
 
           <FlatList
             style={styles.list}
+            contentContainerStyle={styles.listContent}
             data={todos}
             keyExtractor={(item) => item.id}
             renderItem={({ item }) => (
@@ -117,6 +118,8 @@ export default function TodoOverlayContent({ shape, borderRadius, width, height,
             ListEmptyComponent={
               <Text style={styles.emptyText}>No tasks yet — add one above</Text>
             }
+            nestedScrollEnabled={true}
+            keyboardShouldPersistTaps="handled"
           />
         </View>
       </View>
@@ -125,37 +128,39 @@ export default function TodoOverlayContent({ shape, borderRadius, width, height,
 }
 
 const styles = StyleSheet.create({
-  container: { flex: 1, backgroundColor: 'rgba(30,30,45,0.95)', borderRadius: 20, overflow: 'hidden' },
-  content: { flex: 1, padding: 10, gap: 8 },
-  inputRow: { flexDirection: 'row', gap: 8 },
+  container: { flex: 1, backgroundColor: 'rgba(30,30,45,0.95)' },
+  content: { flex: 1, padding: 8, gap: 6 },
+  inputRow: { flexDirection: 'row', gap: 6, alignItems: 'center' },
   input: {
     flex: 1,
     backgroundColor: 'rgba(255,255,255,0.1)',
     color: 'white',
     borderRadius: 8,
-    paddingHorizontal: 10,
-    paddingVertical: 6,
+    paddingHorizontal: 8,
+    paddingVertical: 5,
+    fontSize: 13,
   },
-  addButton: { backgroundColor: '#c084fc', borderRadius: 8, paddingHorizontal: 14, justifyContent: 'center' },
-  addButtonText: { color: '#1a1030', fontWeight: '700' },
+  addButton: { backgroundColor: '#c084fc', borderRadius: 8, paddingHorizontal: 12, paddingVertical: 6, justifyContent: 'center' },
+  addButtonText: { color: '#1a1030', fontWeight: '700', fontSize: 12 },
   progress: { color: '#94a3b8', fontSize: 11 },
   list: { flex: 1, marginTop: 2 },
+  listContent: { paddingBottom: 8 },
   row: {
     flexDirection: 'row',
     alignItems: 'center',
-    gap: 8,
+    gap: 6,
     backgroundColor: 'rgba(255,255,255,0.06)',
     borderRadius: 8,
     paddingHorizontal: 8,
-    paddingVertical: 6,
+    paddingVertical: 5,
     marginBottom: 4,
   },
   toggleButton: { width: 22, alignItems: 'center' },
-  checkbox: { color: '#94a3b8', fontSize: 16 },
+  checkbox: { color: '#94a3b8', fontSize: 15 },
   checkboxChecked: { color: '#4ade80' },
-  rowText: { flex: 1, color: '#e2e8f0', fontSize: 13 },
+  rowText: { flex: 1, color: '#e2e8f0', fontSize: 12 },
   rowTextDone: { textDecorationLine: 'line-through', color: '#64748b' },
   deleteButton: { width: 20, alignItems: 'center' },
-  deleteText: { color: '#f87171', fontSize: 13, fontWeight: '700' },
+  deleteText: { color: '#f87171', fontSize: 12, fontWeight: '700' },
   emptyText: { color: '#666', fontSize: 12, fontStyle: 'italic' },
 });

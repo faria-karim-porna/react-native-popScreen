@@ -52,7 +52,7 @@ jest.mock('react-native', () => ({
   findNodeHandle: () => 1,
 }));
 
-import { NativeModules } from 'react-native';
+import { NativeModules, View } from 'react-native';
 import PopScreenContent from '../PopScreenContent';
 
 const mockSetHandleDimensions = NativeModules.PopScreen.setHandleDimensions;
@@ -185,5 +185,90 @@ describe('PopScreenContent', () => {
       );
     });
     expect(root.toJSON()).toBeTruthy();
+  });
+
+  it('wraps children in a ScrollView by default so content adapts to small overlays', () => {
+    let root: any;
+    act(() => {
+      root = create(<PopScreenContent><View /></PopScreenContent>);
+    });
+    const json = root.toJSON();
+    // Container children: [scroll body]. No header by default.
+    expect(json.children[0].type).toBe('ScrollView');
+  });
+
+  it('renders a plain View body when scrollable={false}', () => {
+    let root: any;
+    act(() => {
+      root = create(<PopScreenContent scrollable={false}><View /></PopScreenContent>);
+    });
+    const json = root.toJSON();
+    expect(json.children[0].type).toBe('View');
+  });
+
+  it('keeps the header outside the scrollable body', () => {
+    let root: any;
+    act(() => {
+      root = create(<PopScreenContent showHeader={true} headerProps={{ title: 'Scroll Header' }}><View /></PopScreenContent>);
+    });
+    const json = root.toJSON();
+    expect(json.children[0].type).toBe('View'); // header container
+    expect(json.children[1].type).toBe('ScrollView'); // scroll body
+    expect(JSON.stringify(json)).toContain('Scroll Header');
+  });
+
+  it('does not pin the container to the width/height props so content adapts to window resizes', () => {
+    let root: any;
+    act(() => {
+      root = create(<PopScreenContent width={300} height={400}><></></PopScreenContent>);
+    });
+    const json = root.toJSON();
+    const style = json.props.style;
+    expect(style).toEqual(
+      expect.not.arrayContaining([expect.objectContaining({ width: 300 })])
+    );
+    expect(style).toEqual(
+      expect.not.arrayContaining([expect.objectContaining({ height: 400 })])
+    );
+  });
+
+  it('applies shape-aware padding for circle and pill shapes', () => {
+    let rootCircle: any;
+    let rootPill: any;
+    act(() => {
+      rootCircle = create(<PopScreenContent shape="circle"><></></PopScreenContent>);
+      rootPill = create(<PopScreenContent shape="pill"><></></PopScreenContent>);
+    });
+
+    const circleStyle = rootCircle.toJSON().props.style;
+    const pillStyle = rootPill.toJSON().props.style;
+
+    expect(circleStyle).toEqual(
+      expect.arrayContaining([
+        expect.objectContaining({ paddingHorizontal: 12, paddingVertical: 10 }),
+      ])
+    );
+    expect(pillStyle).toEqual(
+      expect.arrayContaining([
+        expect.objectContaining({ paddingHorizontal: 12, paddingVertical: 6 }),
+      ])
+    );
+  });
+
+  it('passes contentContainerStyle to the inner ScrollView', () => {
+    let root: any;
+    act(() => {
+      root = create(
+        <PopScreenContent contentContainerStyle={{ paddingBottom: 20 }}>
+          <View />
+        </PopScreenContent>
+      );
+    });
+    const json = root.toJSON();
+    const scrollView = json.children[0];
+    expect(scrollView.type).toBe('ScrollView');
+    expect(scrollView.props.contentContainerStyle).toEqual(
+      expect.arrayContaining([expect.objectContaining({ paddingBottom: 20 })])
+    );
   });
 });

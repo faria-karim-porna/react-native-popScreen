@@ -38,13 +38,22 @@ export interface PopScreenContentProps {
     maxWidth?: number;
     /** Maximum overlay height in dp */
     maxHeight?: number;
+    /**
+     * Whether the content body scrolls when it exceeds the overlay size
+     * (default: true). Set to `false` if children manage their own scrolling
+     * (e.g. a `FlatList`) — nesting a VirtualizedList inside the ScrollView
+     * would break scrolling.
+     */
+    scrollable?: boolean;
     /** Container style for PopScreenContent */
     style?: StyleProp<ViewStyle>;
+    /** Content container style for inner ScrollView */
+    contentContainerStyle?: StyleProp<ViewStyle>;
 }
 /**
  * Wraps whatever arbitrary RN content the developer wants shown in the
  * floating overlay. Also accepts optional config props that propagate
  * to the native interceptor's touch regions, window rect, constraints, shape, and radius options.
  */
-export default function PopScreenContent({ children, dragHandleHeight, resizeHandleSize, showHeader, header, headerProps, dragMode, shape, borderRadius, width, height, minWidth, minHeight, maxWidth, maxHeight, style, }: PopScreenContentProps): React.JSX.Element;
+export default function PopScreenContent({ children, dragHandleHeight, resizeHandleSize, showHeader, header, headerProps, dragMode, shape, borderRadius, width, height, minWidth, minHeight, maxWidth, maxHeight, scrollable, style, contentContainerStyle, }: PopScreenContentProps): React.JSX.Element;
 //# sourceMappingURL=PopScreenContent.d.ts.map

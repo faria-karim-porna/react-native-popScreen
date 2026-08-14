@@ -14,8 +14,15 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 - Native drag interception now uses deferred (touch-slop) interception: taps
   inside the drag region (header buttons, text fields) pass through to the
   content, and the window only starts dragging once the finger actually moves.
+- `PopScreenContent` `scrollable` prop (default `true`) — the content body is
+  wrapped in a `ScrollView` so it scrolls when it exceeds the overlay size
+  instead of being cut off. Set `scrollable={false}` for content that manages
+  its own scrolling (e.g. a `FlatList`).
 
 ### Changed
+- `PopScreenContent` no longer pins the content view to the `width`/`height`
+  props — content always fills the actual overlay window size, so it adapts
+  instead of being cut off when the window is resized with the corner handle.
 - The example app is fully TypeScript now: `App.tsx`, `index.tsx`, and
   `registerOverlaySurface.ts` replace the former `.js` files (`package.json`
   `main` updated to `index.tsx`).

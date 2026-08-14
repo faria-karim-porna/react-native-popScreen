@@ -94,4 +94,15 @@ describe('PopScreenHeader', () => {
     expect(json).not.toContain('header-cancel-button');
     expect(json).not.toContain('header-back-to-app-button');
   });
+
+  it('renders compact button labels when compact prop is true', () => {
+    let root: any;
+    act(() => {
+      root = create(<PopScreenHeader compact={true} title="Compact Header" />);
+    });
+    const json = JSON.stringify(root.toJSON());
+    expect(json).toContain('Compact Header');
+    expect(json).toContain('Back');
+    expect(json).not.toContain('Back to Main App');
+  });
 });

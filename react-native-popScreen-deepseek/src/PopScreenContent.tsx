@@ -1,5 +1,5 @@
 import React, { useEffect } from 'react';
-import { View, StyleSheet, StyleProp, ViewStyle } from 'react-native';
+import { View, ScrollView, StyleSheet, StyleProp, ViewStyle } from 'react-native';
 import { PopScreenModule, resolveDragMode } from './PopScreenModule';
 import PopScreenHeader, { PopScreenHeaderProps } from './PopScreenHeader';
 import { OverlayShape, DragMode } from './PopScreen.types';
@@ -40,8 +40,17 @@ export interface PopScreenContentProps {
   maxWidth?: number;
   /** Maximum overlay height in dp */
   maxHeight?: number;
+  /**
+   * Whether the content body scrolls when it exceeds the overlay size
+   * (default: true). Set to `false` if children manage their own scrolling
+   * (e.g. a `FlatList`) — nesting a VirtualizedList inside the ScrollView
+   * would break scrolling.
+   */
+  scrollable?: boolean;
   /** Container style for PopScreenContent */
   style?: StyleProp<ViewStyle>;
+  /** Content container style for inner ScrollView */
+  contentContainerStyle?: StyleProp<ViewStyle>;
 }
 
 /**
@@ -65,7 +74,9 @@ export default function PopScreenContent({
   minHeight,
   maxWidth,
   maxHeight,
+  scrollable = true,
   style,
+  contentContainerStyle,
 }: PopScreenContentProps) {
   // In 'header' mode the drag strip matches the header height (default 40dp)
   // unless the caller explicitly overrides it via dragHandleHeight.
@@ -106,14 +117,17 @@ export default function PopScreenContent({
     const effectiveShape = shape ?? (borderRadius !== undefined ? 'rounded' : 'rounded');
     let defaultRadius = 16;
     let aspectRatio: number | undefined = undefined;
+    let shapePadding: ViewStyle = {};
 
     switch (effectiveShape) {
       case 'circle':
         defaultRadius = 9999;
         aspectRatio = 1;
+        shapePadding = { paddingHorizontal: 12, paddingVertical: 10 };
         break;
       case 'pill':
         defaultRadius = 9999;
+        shapePadding = { paddingHorizontal: 12, paddingVertical: 6 };
         break;
       case 'square':
         defaultRadius = 0;
@@ -134,15 +148,31 @@ export default function PopScreenContent({
       borderRadius: computedRadius,
       overflow: 'hidden',
       ...(aspectRatio !== undefined ? { aspectRatio } : {}),
-      ...(width !== undefined ? { width } : {}),
-      ...(height !== undefined ? { height } : {}),
+      ...shapePadding,
     };
+  };
+
+  const renderBody = () => {
+    if (!scrollable) {
+      return <View style={styles.body}>{children}</View>;
+    }
+    return (
+      <ScrollView
+        style={styles.body}
+        contentContainerStyle={[styles.bodyContent, contentContainerStyle]}
+        keyboardShouldPersistTaps="handled"
+        showsVerticalScrollIndicator={false}
+        nestedScrollEnabled={true}
+      >
+        {children}
+      </ScrollView>
+    );
   };
 
   return (
     <View style={[styles.container, getComputedShapeStyle(), style]}>
       {renderHeader()}
-      {children}
+      {renderBody()}
     </View>
   );
 }
@@ -150,6 +180,12 @@ export default function PopScreenContent({
 const styles = StyleSheet.create({
   container: {
     flex: 1,
+  },
+  body: {
+    flex: 1,
+  },
+  bodyContent: {
+    flexGrow: 1,
   },
 });
 

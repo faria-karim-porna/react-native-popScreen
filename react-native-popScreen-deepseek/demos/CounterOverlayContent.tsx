@@ -33,7 +33,14 @@ export default function CounterOverlayContent({ shape, borderRadius, width, heig
   const [count, setCount] = usePopScreen<number>('count', 0);
 
   return (
-    <PopScreenContent shape={shape} borderRadius={borderRadius} width={width} height={height} dragMode={dragMode}>
+    <PopScreenContent
+      shape={shape}
+      borderRadius={borderRadius}
+      width={width}
+      height={height}
+      dragMode={dragMode}
+      contentContainerStyle={styles.scrollContent}
+    >
       <View style={styles.container}>
         <View style={styles.content}>
           <Text style={styles.countText}>{count}</Text>
@@ -58,10 +65,11 @@ export default function CounterOverlayContent({ shape, borderRadius, width, heig
 }
 
 const styles = StyleSheet.create({
-  container: { flex: 1, backgroundColor: 'rgba(30,30,45,0.95)' },
-  content: { flex: 1, justifyContent: 'center', alignItems: 'center', gap: 14 },
-  countText: { color: 'white', fontSize: 40, fontWeight: '700' },
-  buttonRow: { flexDirection: 'row', gap: 16 },
+  scrollContent: { flexGrow: 1 },
+  container: { flex: 1, backgroundColor: 'rgba(30,30,45,0.95)', minHeight: '100%', justifyContent: 'center' },
+  content: { flexGrow: 1, justifyContent: 'center', alignItems: 'center', padding: 12, gap: 12 },
+  countText: { color: 'white', fontSize: 36, fontWeight: '700' },
+  buttonRow: { flexDirection: 'row', gap: 16, alignItems: 'center', justifyContent: 'center' },
   button: { width: 48, height: 48, borderRadius: 24, justifyContent: 'center', alignItems: 'center' },
   decrementButton: { backgroundColor: '#f87171' },
   incrementButton: { backgroundColor: '#4ade80' },

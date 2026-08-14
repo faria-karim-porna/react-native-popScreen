@@ -51,7 +51,7 @@ The bottom-right resize corner keeps working in every mode.
 
 ## Configuration & Header
 
-### `<PopScreenContent dragHandleHeight? resizeHandleSize? dragMode? showHeader? header? headerProps?>`
+### `<PopScreenContent dragHandleHeight? resizeHandleSize? dragMode? showHeader? header? headerProps? scrollable?>`
 Wraps your overlay UI.
 - `dragHandleHeight` (dp): Height of the top drag-handle strip in `'handle'` mode (default: 32).
 - `resizeHandleSize` (dp): Overrides the bottom-right resize handle target size (default: 24).
@@ -62,10 +62,21 @@ Wraps your overlay UI.
 - `showHeader` (boolean): Shows or hides the header in the overlay (default: `false`).
 - `header` (ReactNode): Custom header element (overrides default `<PopScreenHeader />`).
 - `headerProps`: Props passed to default `<PopScreenHeader />`.
+- `scrollable` (boolean): Wraps the content body in a `ScrollView` so it scrolls
+  when it exceeds the overlay size (default: `true`). Set to `false` when children
+  manage their own scrolling (e.g. a `FlatList`) — nesting a VirtualizedList inside
+  the ScrollView would break scrolling.
+- `width` / `height` (dp): Initial overlay window size (passed to `setWindowRect`).
+  The content itself always fills the *actual* window size, so it adapts when the
+  user resizes the window with the bottom-right corner handle.
 
 > Taps in the drag region (header buttons, text fields, …) still pass through to
 > the content — the window only starts dragging once the finger moves past touch
 > slop.
+
+> In `dragMode="body"` the whole overlay is a drag region, so scrollable content
+> inside it does not scroll — drag moves the window instead. Use `'handle'`/
+> `'header'` modes for overlays that need to scroll.
 
 ### `<PopScreenHeader title? onCancel? onBackToApp? showCancel? showBackToApp?>`
 Configurable React Native overlay header. Includes **Cancel** (hides overlay) and **Back to Main App** (launches host app and hides overlay) buttons by default.

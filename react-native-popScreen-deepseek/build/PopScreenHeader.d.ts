@@ -15,6 +15,8 @@ export interface PopScreenHeaderProps {
     cancelText?: string;
     /** Custom text for Back to Main App button (default: "Back to Main App") */
     backToAppText?: string;
+    /** Whether to force compact layout for small overlay widths */
+    compact?: boolean;
     /** Custom container style */
     style?: StyleProp<ViewStyle>;
     /** Custom title text style */
@@ -26,5 +28,5 @@ export interface PopScreenHeaderProps {
     /** Custom header children node (overrides default title and buttons if provided) */
     children?: React.ReactNode;
 }
-export default function PopScreenHeader({ title, onCancel, onBackToApp, showCancel, showBackToApp, cancelText, backToAppText, style, titleStyle, buttonStyle, buttonTextStyle, children, }: PopScreenHeaderProps): React.JSX.Element;
+export default function PopScreenHeader({ title, onCancel, onBackToApp, showCancel, showBackToApp, cancelText, backToAppText, compact, style, titleStyle, buttonStyle, buttonTextStyle, children, }: PopScreenHeaderProps): React.JSX.Element;
 //# sourceMappingURL=PopScreenHeader.d.ts.map
