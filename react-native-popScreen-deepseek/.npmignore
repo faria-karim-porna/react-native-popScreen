@@ -39,6 +39,8 @@ coverage/
 .idea/
 .vscode/
 .claude/
+.agents/
+eas.json
 .DS_Store
 *.swp
 *.swo
