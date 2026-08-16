@@ -41,23 +41,21 @@ export default function CounterOverlayContent({ shape, borderRadius, width, heig
       dragMode={dragMode}
       contentContainerStyle={styles.scrollContent}
     >
-      <View style={styles.container}>
-        <View style={styles.content}>
-          <Text style={styles.countText}>{count}</Text>
-          <View style={styles.buttonRow}>
-            <Pressable
-              style={[styles.button, styles.decrementButton]}
-              onPress={() => setCount((c) => c - 1)}
-            >
-              <Text style={styles.buttonText}>−</Text>
-            </Pressable>
-            <Pressable
-              style={[styles.button, styles.incrementButton]}
-              onPress={() => setCount((c) => c + 1)}
-            >
-              <Text style={styles.buttonText}>+</Text>
-            </Pressable>
-          </View>
+      <View style={styles.content}>
+        <Text style={styles.countText}>{count}</Text>
+        <View style={styles.buttonRow}>
+          <Pressable
+            style={[styles.button, styles.decrementButton]}
+            onPress={() => setCount((c) => c - 1)}
+          >
+            <Text style={styles.buttonText}>−</Text>
+          </Pressable>
+          <Pressable
+            style={[styles.button, styles.incrementButton]}
+            onPress={() => setCount((c) => c + 1)}
+          >
+            <Text style={styles.buttonText}>+</Text>
+          </Pressable>
         </View>
       </View>
     </PopScreenContent>
@@ -65,9 +63,12 @@ export default function CounterOverlayContent({ shape, borderRadius, width, heig
 }
 
 const styles = StyleSheet.create({
-  scrollContent: { flexGrow: 1 },
-  container: { flex: 1, backgroundColor: 'rgba(30,30,45,0.95)', minHeight: '100%', justifyContent: 'center' },
-  content: { flexGrow: 1, justifyContent: 'center', alignItems: 'center', padding: 12, gap: 12 },
+  // The background + centering live on the ScrollView content container so
+  // the content stays naturally sized: when the overlay is smaller than the
+  // content it grows and the body scrolls (both axes) instead of being cut,
+  // and when there is room it centers and fills the window.
+  scrollContent: { flexGrow: 1, justifyContent: 'center', backgroundColor: 'rgba(30,30,45,0.95)' },
+  content: { alignItems: 'center', padding: 12, gap: 12 },
   countText: { color: 'white', fontSize: 36, fontWeight: '700' },
   buttonRow: { flexDirection: 'row', gap: 16, alignItems: 'center', justifyContent: 'center' },
   button: { width: 48, height: 48, borderRadius: 24, justifyContent: 'center', alignItems: 'center' },

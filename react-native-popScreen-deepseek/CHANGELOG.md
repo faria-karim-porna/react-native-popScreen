@@ -19,6 +19,17 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
   instead of being cut off. Set `scrollable={false}` for content that manages
   its own scrolling (e.g. a `FlatList`).
 
+### Fixed
+- Content inside the overlay is no longer cut off: the scrollable body now
+  scrolls **both vertically and horizontally** (vertical `ScrollView` wrapping
+  a horizontal one) so content larger than the overlay is always reachable.
+- `PopScreenHeader` buttons now shrink (with their text truncating) instead of
+  overflowing, and the title truncates — the header always auto-fits the
+  overlay width and is never clipped at the window edge.
+- The Counter demo content is naturally sized (background/centering moved to
+  the scroll content container) so it scrolls instead of being cut when the
+  overlay is smaller than the content.
+
 ### Changed
 - `PopScreenContent` no longer pins the content view to the `width`/`height`
   props — content always fills the actual overlay window size, so it adapts

@@ -197,6 +197,32 @@ describe('PopScreenContent', () => {
     expect(json.children[0].type).toBe('ScrollView');
   });
 
+  it('nests a horizontal ScrollView inside the vertical ScrollView so content scrolls both axes', () => {
+    let root: any;
+    act(() => {
+      root = create(<PopScreenContent><View /></PopScreenContent>);
+    });
+    const json = root.toJSON();
+    const outer = json.children[0];
+    expect(outer.type).toBe('ScrollView');
+    expect(outer.props.horizontal).not.toBe(true);
+    // The vertical ScrollView wraps a horizontal ScrollView which holds the children.
+    const inner = outer.children[0];
+    expect(inner.type).toBe('ScrollView');
+    expect(inner.props.horizontal).toBe(true);
+  });
+
+  it('renders children inside the inner horizontal ScrollView', () => {
+    let root: any;
+    act(() => {
+      root = create(<PopScreenContent><View /></PopScreenContent>);
+    });
+    const json = root.toJSON();
+    const inner = json.children[0].children[0];
+    expect(inner.type).toBe('ScrollView');
+    expect(inner.children[0].type).toBe('View');
+  });
+
   it('renders a plain View body when scrollable={false}', () => {
     let root: any;
     act(() => {

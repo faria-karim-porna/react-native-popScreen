@@ -161,7 +161,10 @@ const styles = StyleSheet.create({
     borderRadius: 6,
     justifyContent: 'center',
     alignItems: 'center',
-    flexShrink: 0,
+    // Buttons shrink (with their text truncating) instead of pushing past
+    // the window edge, so the header always fits the overlay width.
+    flexShrink: 1,
+    minWidth: 0,
   },
   backButton: {
     backgroundColor: 'rgba(59, 130, 246, 0.2)',

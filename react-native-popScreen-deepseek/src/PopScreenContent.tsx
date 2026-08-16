@@ -42,8 +42,9 @@ export interface PopScreenContentProps {
   maxHeight?: number;
   /**
    * Whether the content body scrolls when it exceeds the overlay size
-   * (default: true). Set to `false` if children manage their own scrolling
-   * (e.g. a `FlatList`) — nesting a VirtualizedList inside the ScrollView
+   * (default: true). The body scrolls both vertically and horizontally.
+   * Set to `false` if children manage their own scrolling (e.g. a
+   * `FlatList`) — nesting a VirtualizedList inside the ScrollView
    * would break scrolling.
    */
   scrollable?: boolean;
@@ -157,6 +158,9 @@ export default function PopScreenContent({
       return <View style={styles.body}>{children}</View>;
     }
     return (
+      // A vertical ScrollView wrapping a horizontal ScrollView gives the
+      // content both scroll axes, so content larger than the overlay is
+      // never cut off — it scrolls vertically and/or horizontally instead.
       <ScrollView
         style={styles.body}
         contentContainerStyle={[styles.bodyContent, contentContainerStyle]}
@@ -164,7 +168,15 @@ export default function PopScreenContent({
         showsVerticalScrollIndicator={false}
         nestedScrollEnabled={true}
       >
-        {children}
+        <ScrollView
+          horizontal
+          contentContainerStyle={styles.bodyContent}
+          showsHorizontalScrollIndicator={false}
+          keyboardShouldPersistTaps="handled"
+          nestedScrollEnabled={true}
+        >
+          {children}
+        </ScrollView>
       </ScrollView>
     );
   };

@@ -2,7 +2,7 @@
   "name": "popscreen",
   "version": "1.0.0",
   "description": "Android-only floating overlay library for React Native (Expo). Render any RN UI as a system-level floating window.",
-  "main": "build/index.js",
+  "main": "index.tsx",
   "types": "build/index.d.ts",
   "exports": {
     ".": {

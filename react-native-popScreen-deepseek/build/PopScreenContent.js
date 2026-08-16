@@ -84,7 +84,11 @@ function PopScreenContent({ children, dragHandleHeight, resizeHandleSize, showHe
         if (!scrollable) {
             return (0, jsx_runtime_1.jsx)(react_native_1.View, { style: styles.body, children: children });
         }
-        return ((0, jsx_runtime_1.jsx)(react_native_1.ScrollView, { style: styles.body, contentContainerStyle: [styles.bodyContent, contentContainerStyle], keyboardShouldPersistTaps: "handled", showsVerticalScrollIndicator: false, nestedScrollEnabled: true, children: children }));
+        return (
+        // A vertical ScrollView wrapping a horizontal ScrollView gives the
+        // content both scroll axes, so content larger than the overlay is
+        // never cut off — it scrolls vertically and/or horizontally instead.
+        (0, jsx_runtime_1.jsx)(react_native_1.ScrollView, { style: styles.body, contentContainerStyle: [styles.bodyContent, contentContainerStyle], keyboardShouldPersistTaps: "handled", showsVerticalScrollIndicator: false, nestedScrollEnabled: true, children: (0, jsx_runtime_1.jsx)(react_native_1.ScrollView, { horizontal: true, contentContainerStyle: styles.bodyContent, showsHorizontalScrollIndicator: false, keyboardShouldPersistTaps: "handled", nestedScrollEnabled: true, children: children }) }));
     };
     return ((0, jsx_runtime_1.jsxs)(react_native_1.View, { style: [styles.container, getComputedShapeStyle(), style], children: [renderHeader(), renderBody()] }));
 }

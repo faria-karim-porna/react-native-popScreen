@@ -105,4 +105,18 @@ describe('PopScreenHeader', () => {
     expect(json).toContain('Back');
     expect(json).not.toContain('Back to Main App');
   });
+
+  it('lets buttons shrink instead of overflowing past the window edge', () => {
+    let root: any;
+    act(() => {
+      root = create(<PopScreenHeader />);
+    });
+    const backButton = root.root.findByProps({ testID: 'header-back-to-app-button' });
+    const cancelButton = root.root.findByProps({ testID: 'header-cancel-button' });
+    // style is a callback ({ pressed }) => [...] — resolve it without a press.
+    const backStyle = backButton.props.style({ pressed: false })[0];
+    const cancelStyle = cancelButton.props.style({ pressed: false })[0];
+    expect(backStyle.flexShrink).toBe(1);
+    expect(cancelStyle.flexShrink).toBe(1);
+  });
 });

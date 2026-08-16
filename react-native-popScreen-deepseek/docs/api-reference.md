@@ -62,10 +62,11 @@ Wraps your overlay UI.
 - `showHeader` (boolean): Shows or hides the header in the overlay (default: `false`).
 - `header` (ReactNode): Custom header element (overrides default `<PopScreenHeader />`).
 - `headerProps`: Props passed to default `<PopScreenHeader />`.
-- `scrollable` (boolean): Wraps the content body in a `ScrollView` so it scrolls
-  when it exceeds the overlay size (default: `true`). Set to `false` when children
-  manage their own scrolling (e.g. a `FlatList`) — nesting a VirtualizedList inside
-  the ScrollView would break scrolling.
+- `scrollable` (boolean): Wraps the content body in a `ScrollView` that scrolls
+  **both vertically and horizontally**, so content larger than the overlay is
+  never cut off (default: `true`). Set to `false` when children manage their own
+  scrolling (e.g. a `FlatList`) — nesting a VirtualizedList inside the ScrollView
+  would break scrolling.
 - `width` / `height` (dp): Initial overlay window size (passed to `setWindowRect`).
   The content itself always fills the *actual* window size, so it adapts when the
   user resizes the window with the bottom-right corner handle.
@@ -79,7 +80,7 @@ Wraps your overlay UI.
 > `'header'` modes for overlays that need to scroll.
 
 ### `<PopScreenHeader title? onCancel? onBackToApp? showCancel? showBackToApp?>`
-Configurable React Native overlay header. Includes **Cancel** (hides overlay) and **Back to Main App** (launches host app and hides overlay) buttons by default.
+Configurable React Native overlay header. Includes **Cancel** (hides overlay) and **Back to Main App** (launches host app and hides overlay) buttons by default. The header **auto-fits the overlay width**: it compacts its labels in narrow windows (e.g. `Back to Main App` → `Back`, `Cancel` → `✕`) and its buttons/title shrink and truncate instead of overflowing, so the header is never cut off.
 
 ## State hook
 
