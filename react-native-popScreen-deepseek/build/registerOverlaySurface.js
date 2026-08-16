@@ -2,23 +2,19 @@
 Object.defineProperty(exports, "__esModule", { value: true });
 exports.registerOverlaySurface = registerOverlaySurface;
 const react_native_1 = require("react-native");
-const SURFACE_NAME = 'PopScreenOverlay';
-let registered = false;
+const OVERLAY_SURFACE_NAME = 'PopScreenOverlay';
+let alreadyRegistered = false;
 /**
- * Call once, early in the host app's lifecycle (e.g. at the top of
- * index.tsx, alongside the main app's registerRootComponent call), passing
- * the component tree to render inside the floating overlay window.
- *
- * This must match PopScreenReactSurfaceHost's surfaceName parameter
- * exactly, or the native side will attach to a surface name nothing has
- * registered, resulting in a blank overlay window.
+ * Register the component to render inside the floating overlay window.
+ * Call this once in your app's entry file (e.g. index.tsx), alongside
+ * `registerRootComponent`. Calling it more than once is a no-op.
  */
 function registerOverlaySurface(component) {
-    if (registered) {
+    if (alreadyRegistered) {
         console.warn('[PopScreen] registerOverlaySurface called more than once — ignoring.');
         return;
     }
-    registered = true;
-    react_native_1.AppRegistry.registerComponent(SURFACE_NAME, () => component);
+    alreadyRegistered = true;
+    react_native_1.AppRegistry.registerComponent(OVERLAY_SURFACE_NAME, () => component);
 }
 //# sourceMappingURL=registerOverlaySurface.js.map

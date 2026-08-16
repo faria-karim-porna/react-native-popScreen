@@ -15,19 +15,19 @@ export interface PopScreenNativeModule {
     setDragMode(mode?: number): Promise<void>;
 }
 /**
- * The native PopScreen module wrapper.
- * Sanitizes undefined numbers with default values so the Android bridge never throws NullPointerException on primitive unboxing.
- * Falls back to a stub if the native module is not available.
+ * Typed wrapper around the native PopScreen module.
+ * Fills in default values for optional number params so the Android bridge
+ * never receives `undefined` (which would cause a NullPointerException).
  */
 export declare const PopScreenModule: PopScreenNativeModule;
 /**
- * Native drag interceptor modes. Mirrors OverlayService.kt `DRAG_MODE_*`:
- * 1 = top drag-handle band, 2 = whole body draggable.
+ * Numeric drag-mode constants that match the values in OverlayService.kt.
+ * 1 = top drag-handle band, 2 = whole body.
  */
-export declare const DRAG_MODE: {
+export declare const NATIVE_DRAG_MODE: {
     readonly BAND: 1;
     readonly BODY: 2;
 };
-/** Maps the public `DragMode` string to the native interceptor mode. */
+/** Convert a friendly DragMode string to its native numeric constant. */
 export declare function resolveDragMode(mode?: DragMode): number;
 //# sourceMappingURL=PopScreenModule.d.ts.map

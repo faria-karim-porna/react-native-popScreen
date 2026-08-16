@@ -9,14 +9,9 @@ const react_1 = require("react");
 const react_native_1 = require("react-native");
 const PopScreenModule_1 = require("./PopScreenModule");
 const PopScreenHeader_1 = __importDefault(require("./PopScreenHeader"));
-/**
- * Wraps whatever arbitrary RN content the developer wants shown in the
- * floating overlay. Also accepts optional config props that propagate
- * to the native interceptor's touch regions, window rect, constraints, shape, and radius options.
- */
+const DEFAULT_HEADER_HEIGHT_DP = 40;
 function PopScreenContent({ children, dragHandleHeight, resizeHandleSize, showHeader = false, header, headerProps, dragMode, shape, borderRadius, width, height, minWidth, minHeight, maxWidth, maxHeight, scrollable = true, style, contentContainerStyle, }) {
-    // In 'header' mode the drag strip matches the header height (default 40dp)
-    // unless the caller explicitly overrides it via dragHandleHeight.
+    // In 'header' mode, match drag height to the header height unless overridden
     const effectiveDragHandleHeight = dragMode === 'header' ? (dragHandleHeight !== null && dragHandleHeight !== void 0 ? dragHandleHeight : DEFAULT_HEADER_HEIGHT_DP) : dragHandleHeight;
     (0, react_1.useEffect)(() => {
         if (effectiveDragHandleHeight !== undefined || resizeHandleSize !== undefined) {
@@ -46,11 +41,11 @@ function PopScreenContent({ children, dragHandleHeight, resizeHandleSize, showHe
         return (0, jsx_runtime_1.jsx)(PopScreenHeader_1.default, { ...headerProps });
     };
     const getComputedShapeStyle = () => {
-        const effectiveShape = shape !== null && shape !== void 0 ? shape : (borderRadius !== undefined ? 'rounded' : 'rounded');
+        const activeShape = shape !== null && shape !== void 0 ? shape : 'rounded';
         let defaultRadius = 16;
         let aspectRatio = undefined;
         let shapePadding = {};
-        switch (effectiveShape) {
+        switch (activeShape) {
             case 'circle':
                 defaultRadius = 9999;
                 aspectRatio = 1;
@@ -72,9 +67,8 @@ function PopScreenContent({ children, dragHandleHeight, resizeHandleSize, showHe
                 defaultRadius = 16;
                 break;
         }
-        const computedRadius = borderRadius !== null && borderRadius !== void 0 ? borderRadius : defaultRadius;
         return {
-            borderRadius: computedRadius,
+            borderRadius: borderRadius !== null && borderRadius !== void 0 ? borderRadius : defaultRadius,
             overflow: 'hidden',
             ...(aspectRatio !== undefined ? { aspectRatio } : {}),
             ...shapePadding,
@@ -84,11 +78,7 @@ function PopScreenContent({ children, dragHandleHeight, resizeHandleSize, showHe
         if (!scrollable) {
             return (0, jsx_runtime_1.jsx)(react_native_1.View, { style: styles.body, children: children });
         }
-        return (
-        // A vertical ScrollView wrapping a horizontal ScrollView gives the
-        // content both scroll axes, so content larger than the overlay is
-        // never cut off — it scrolls vertically and/or horizontally instead.
-        (0, jsx_runtime_1.jsx)(react_native_1.ScrollView, { style: styles.body, contentContainerStyle: [styles.bodyContent, contentContainerStyle], keyboardShouldPersistTaps: "handled", showsVerticalScrollIndicator: false, nestedScrollEnabled: true, children: (0, jsx_runtime_1.jsx)(react_native_1.ScrollView, { horizontal: true, contentContainerStyle: styles.bodyContent, showsHorizontalScrollIndicator: false, keyboardShouldPersistTaps: "handled", nestedScrollEnabled: true, children: children }) }));
+        return ((0, jsx_runtime_1.jsx)(react_native_1.ScrollView, { style: styles.body, contentContainerStyle: [styles.bodyContent, contentContainerStyle], keyboardShouldPersistTaps: "handled", showsVerticalScrollIndicator: false, nestedScrollEnabled: true, children: (0, jsx_runtime_1.jsx)(react_native_1.ScrollView, { horizontal: true, contentContainerStyle: styles.bodyContent, showsHorizontalScrollIndicator: false, keyboardShouldPersistTaps: "handled", nestedScrollEnabled: true, children: children }) }));
     };
     return ((0, jsx_runtime_1.jsxs)(react_native_1.View, { style: [styles.container, getComputedShapeStyle(), style], children: [renderHeader(), renderBody()] }));
 }
@@ -103,6 +93,4 @@ const styles = react_native_1.StyleSheet.create({
         flexGrow: 1,
     },
 });
-/** Default height of the built-in PopScreenHeader (dp). */
-const DEFAULT_HEADER_HEIGHT_DP = 40;
 //# sourceMappingURL=PopScreenContent.js.map

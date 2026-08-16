@@ -1,9 +1,10 @@
+/** Shape of the floating overlay window. */
 export type OverlayShape = 'rectangle' | 'rounded' | 'circle' | 'square' | 'pill';
 /**
  * Where the overlay window can be dragged from:
- * - `'handle'` — a top drag-handle strip sized by `dragHandleHeight` (default 32dp).
- * - `'header'` — only the header is draggable (band auto-matches the header height, default 40dp).
- * - `'body'`   — the whole overlay body is draggable (bottom-right resize corner still works).
+ * - `'handle'` — a top drag-handle strip (default, 32dp tall).
+ * - `'header'` — the header area is draggable (auto-sizes to header height).
+ * - `'body'`   — the whole overlay is draggable.
  */
 export type DragMode = 'handle' | 'header' | 'body';
 export type ReactArchitecture = 'NEW_ARCHITECTURE' | 'OLD_ARCHITECTURE' | 'UNKNOWN';
@@ -12,16 +13,16 @@ export type ReactArchitectureInfo = {
     isNewArchitecture: boolean;
     reactNativeVersion: string | null;
 };
-export type DragUpdatePhase = 'start' | 'move' | 'end';
+export type GesturePhase = 'start' | 'move' | 'end';
 export type DragUpdateEvent = {
-    phase: DragUpdatePhase;
+    phase: GesturePhase;
     x?: number;
     y?: number;
     width?: number;
     height?: number;
 };
 export type ResizeUpdateEvent = {
-    phase: 'start' | 'move' | 'end';
+    phase: GesturePhase;
     x?: number;
     y?: number;
     width?: number;

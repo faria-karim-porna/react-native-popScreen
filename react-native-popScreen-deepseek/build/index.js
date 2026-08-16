@@ -37,21 +37,20 @@ exports.setDragMode = setDragMode;
 const PopScreenModule_1 = require("./PopScreenModule");
 const react_native_1 = require("react-native");
 const { PopScreen } = react_native_1.NativeModules;
-// ─── Permission functions ────────────────────────────────────────────
+// ─── Permission ───────────────────────────────────────────────────────
 async function hasOverlayPermission() {
     return PopScreenModule_1.PopScreenModule.hasOverlayPermission();
 }
 async function requestOverlayPermission() {
     return PopScreenModule_1.PopScreenModule.requestOverlayPermission();
 }
-// ─── Battery optimization (Milestone 6) ──────────────────────────────
 async function hasBatteryOptimizationExemption() {
     return PopScreenModule_1.PopScreenModule.hasBatteryOptimizationExemption();
 }
 async function requestBatteryOptimizationExemption() {
     return PopScreenModule_1.PopScreenModule.requestBatteryOptimizationExemption();
 }
-// ─── Overlay lifecycle ───────────────────────────────────────────────
+// ─── Overlay lifecycle ────────────────────────────────────────────────
 async function show() {
     return PopScreenModule_1.PopScreenModule.show();
 }
@@ -64,60 +63,53 @@ async function destroy() {
 async function openApp() {
     return PopScreenModule_1.PopScreenModule.openApp();
 }
-// ─── Architecture detection ──────────────────────────────────────────
 async function getReactArchitectureInfo() {
     return PopScreenModule_1.PopScreenModule.getReactArchitectureInfo();
 }
-// ─── Drag / Resize event listeners (Milestones 3-4) ──────────────────
+// ─── Event listeners ──────────────────────────────────────────────────
 const eventEmitter = PopScreen ? new react_native_1.NativeEventEmitter(PopScreen) : null;
 function addDragUpdateListener(listener) {
-    const subscription = eventEmitter === null || eventEmitter === void 0 ? void 0 : eventEmitter.addListener('onDragUpdate', listener);
-    return { remove: () => subscription === null || subscription === void 0 ? void 0 : subscription.remove() };
+    const sub = eventEmitter === null || eventEmitter === void 0 ? void 0 : eventEmitter.addListener('onDragUpdate', listener);
+    return { remove: () => sub === null || sub === void 0 ? void 0 : sub.remove() };
 }
 function addResizeUpdateListener(listener) {
-    const subscription = eventEmitter === null || eventEmitter === void 0 ? void 0 : eventEmitter.addListener('onResizeUpdate', listener);
-    return { remove: () => subscription === null || subscription === void 0 ? void 0 : subscription.remove() };
+    const sub = eventEmitter === null || eventEmitter === void 0 ? void 0 : eventEmitter.addListener('onResizeUpdate', listener);
+    return { remove: () => sub === null || sub === void 0 ? void 0 : sub.remove() };
 }
-// ─── Lifecycle event listeners (Milestone 6) ─────────────────────────
 function addWindowStateChangeListener(listener) {
-    const subscription = eventEmitter === null || eventEmitter === void 0 ? void 0 : eventEmitter.addListener('onWindowStateChange', listener);
-    return { remove: () => subscription === null || subscription === void 0 ? void 0 : subscription.remove() };
+    const sub = eventEmitter === null || eventEmitter === void 0 ? void 0 : eventEmitter.addListener('onWindowStateChange', listener);
+    return { remove: () => sub === null || sub === void 0 ? void 0 : sub.remove() };
 }
 function addPermissionResultListener(listener) {
-    const subscription = eventEmitter === null || eventEmitter === void 0 ? void 0 : eventEmitter.addListener('onPermissionResult', listener);
-    return { remove: () => subscription === null || subscription === void 0 ? void 0 : subscription.remove() };
+    const sub = eventEmitter === null || eventEmitter === void 0 ? void 0 : eventEmitter.addListener('onPermissionResult', listener);
+    return { remove: () => sub === null || sub === void 0 ? void 0 : sub.remove() };
 }
-// ─── Generic window rect control (Milestone 4) ───────────────────────
+// ─── Window control ───────────────────────────────────────────────────
 async function setWindowRect(x, y, width, height) {
     return PopScreenModule_1.PopScreenModule.setWindowRect(x, y, width, height);
 }
 async function setSizeConstraints(minWidth, minHeight, maxWidth, maxHeight) {
     return PopScreenModule_1.PopScreenModule.setSizeConstraints(minWidth, minHeight, maxWidth, maxHeight);
 }
-// ─── Drag configuration (Milestone 4) ────────────────────────────────
-/**
- * Sets where the overlay window can be dragged from: a top drag-handle
- * strip ('handle'), the header only ('header'), or the whole body ('body').
- */
+/** Set where the overlay can be dragged from: 'handle', 'header', or 'body'. */
 async function setDragMode(mode) {
     return PopScreenModule_1.PopScreenModule.setDragMode((0, PopScreenModule_1.resolveDragMode)(mode));
 }
-// ─── Minimize / Restore ──────────────────────────────────────────────
+// ─── Minimize / Restore ───────────────────────────────────────────────
 var minimizeRestore_1 = require("./minimizeRestore");
 Object.defineProperty(exports, "minimize", { enumerable: true, get: function () { return minimizeRestore_1.minimize; } });
 Object.defineProperty(exports, "restore", { enumerable: true, get: function () { return minimizeRestore_1.restore; } });
 Object.defineProperty(exports, "getIsMinimized", { enumerable: true, get: function () { return minimizeRestore_1.getIsMinimized; } });
-// ─── Components & helpers ────────────────────────────────────────────
+// ─── Components & hooks ───────────────────────────────────────────────
 var PopScreenContent_1 = require("./PopScreenContent");
 Object.defineProperty(exports, "PopScreenContent", { enumerable: true, get: function () { return __importDefault(PopScreenContent_1).default; } });
 var PopScreenHeader_1 = require("./PopScreenHeader");
 Object.defineProperty(exports, "PopScreenHeader", { enumerable: true, get: function () { return __importDefault(PopScreenHeader_1).default; } });
 var registerOverlaySurface_1 = require("./registerOverlaySurface");
 Object.defineProperty(exports, "registerOverlaySurface", { enumerable: true, get: function () { return registerOverlaySurface_1.registerOverlaySurface; } });
-// ─── Shared store hook ───────────────────────────────────────────────
 var usePopScreen_1 = require("./usePopScreen");
 Object.defineProperty(exports, "usePopScreen", { enumerable: true, get: function () { return usePopScreen_1.usePopScreen; } });
 Object.defineProperty(exports, "getPopScreenState", { enumerable: true, get: function () { return usePopScreen_1.getPopScreenState; } });
-// ─── Re-export types ─────────────────────────────────────────────────
+// ─── Types ────────────────────────────────────────────────────────────
 __exportStar(require("./PopScreen.types"), exports);
 //# sourceMappingURL=index.js.map

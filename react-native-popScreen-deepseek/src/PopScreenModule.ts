@@ -19,11 +19,12 @@ export interface PopScreenNativeModule {
   setDragMode(mode?: number): Promise<void>;
 }
 
-const DEFAULT_MIN_SIZE = 150;
+const DEFAULT_MIN_SIZE_DP = 150;
 const DEFAULT_DRAG_HANDLE_DP = 32;
 const DEFAULT_RESIZE_HANDLE_DP = 24;
 
-const rawModule = PopScreen ?? {
+// Fallback stub used when the native module is unavailable (e.g. in tests or on iOS).
+const fallbackModule: PopScreenNativeModule = {
   hasOverlayPermission: async () => false,
   requestOverlayPermission: async () => {},
   hasBatteryOptimizationExemption: async () => false,
@@ -43,24 +44,21 @@ const rawModule = PopScreen ?? {
   setDragMode: async () => {},
 };
 
+const rawModule = PopScreen ?? fallbackModule;
+
 /**
- * The native PopScreen module wrapper.
- * Sanitizes undefined numbers with default values so the Android bridge never throws NullPointerException on primitive unboxing.
- * Falls back to a stub if the native module is not available.
+ * Typed wrapper around the native PopScreen module.
+ * Fills in default values for optional number params so the Android bridge
+ * never receives `undefined` (which would cause a NullPointerException).
  */
 export const PopScreenModule: PopScreenNativeModule = {
   ...rawModule,
   setWindowRect: (x, y, width, height) =>
-    rawModule.setWindowRect?.(
-      x ?? -1,
-      y ?? -1,
-      width ?? -1,
-      height ?? -1
-    ) ?? Promise.resolve(),
+    rawModule.setWindowRect?.(x ?? -1, y ?? -1, width ?? -1, height ?? -1) ?? Promise.resolve(),
   setSizeConstraints: (minWidth, minHeight, maxWidth, maxHeight) =>
     rawModule.setSizeConstraints?.(
-      minWidth ?? DEFAULT_MIN_SIZE,
-      minHeight ?? DEFAULT_MIN_SIZE,
+      minWidth ?? DEFAULT_MIN_SIZE_DP,
+      minHeight ?? DEFAULT_MIN_SIZE_DP,
       maxWidth ?? 0,
       maxHeight ?? 0
     ) ?? Promise.resolve(),
@@ -69,17 +67,16 @@ export const PopScreenModule: PopScreenNativeModule = {
       dragHandleHeightDp ?? DEFAULT_DRAG_HANDLE_DP,
       resizeHandleSizeDp ?? DEFAULT_RESIZE_HANDLE_DP
     ) ?? Promise.resolve(),
-  setDragMode: (mode) => rawModule.setDragMode?.(mode ?? DRAG_MODE.BAND) ?? Promise.resolve(),
+  setDragMode: (mode) => rawModule.setDragMode?.(mode ?? NATIVE_DRAG_MODE.BAND) ?? Promise.resolve(),
 };
 
 /**
- * Native drag interceptor modes. Mirrors OverlayService.kt `DRAG_MODE_*`:
- * 1 = top drag-handle band, 2 = whole body draggable.
+ * Numeric drag-mode constants that match the values in OverlayService.kt.
+ * 1 = top drag-handle band, 2 = whole body.
  */
-export const DRAG_MODE = { BAND: 1, BODY: 2 } as const;
+export const NATIVE_DRAG_MODE = { BAND: 1, BODY: 2 } as const;
 
-/** Maps the public `DragMode` string to the native interceptor mode. */
+/** Convert a friendly DragMode string to its native numeric constant. */
 export function resolveDragMode(mode?: DragMode): number {
-  return mode === 'body' ? DRAG_MODE.BODY : DRAG_MODE.BAND;
+  return mode === 'body' ? NATIVE_DRAG_MODE.BODY : NATIVE_DRAG_MODE.BAND;
 }
-

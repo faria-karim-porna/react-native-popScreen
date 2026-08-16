@@ -1,4 +1,4 @@
-import React from 'react';
+import React, { useState } from 'react';
 import {
   View,
   Text,
@@ -11,23 +11,23 @@ import {
 import { PopScreenModule } from './PopScreenModule';
 
 export interface PopScreenHeaderProps {
-  /** Title text shown in the middle of the header */
+  /** Title text shown in the middle of the header (default: "Overlay") */
   title?: string;
-  /** Custom callback for Cancel button (defaults to hiding the overlay) */
+  /** Custom callback when Cancel button is tapped (defaults to hiding the overlay) */
   onCancel?: () => void;
-  /** Custom callback for Back to Main App button (defaults to opening main app and hiding overlay) */
+  /** Custom callback when Back button is tapped (defaults to opening main app and hiding overlay) */
   onBackToApp?: () => void;
   /** Whether to show the Cancel button (default: true) */
   showCancel?: boolean;
   /** Whether to show the Back to Main App button (default: true) */
   showBackToApp?: boolean;
-  /** Custom text for Cancel button (default: "Cancel") */
+  /** Text for Cancel button (default: "Cancel") */
   cancelText?: string;
-  /** Custom text for Back to Main App button (default: "Back to Main App") */
+  /** Text for Back button (default: "Back to Main App") */
   backToAppText?: string;
-  /** Whether to force compact layout for small overlay widths */
+  /** Force compact layout for narrow windows */
   compact?: boolean;
-  /** Custom container style */
+  /** Custom header container style */
   style?: StyleProp<ViewStyle>;
   /** Custom title text style */
   titleStyle?: StyleProp<TextStyle>;
@@ -35,7 +35,7 @@ export interface PopScreenHeaderProps {
   buttonStyle?: StyleProp<ViewStyle>;
   /** Custom button text style */
   buttonTextStyle?: StyleProp<TextStyle>;
-  /** Custom header children node (overrides default title and buttons if provided) */
+  /** Custom header content (replaces default title and buttons) */
   children?: React.ReactNode;
 }
 
@@ -54,15 +54,16 @@ export default function PopScreenHeader({
   buttonTextStyle,
   children,
 }: PopScreenHeaderProps) {
-  const [headerWidth, setHeaderWidth] = React.useState<number | undefined>(undefined);
-  const isNarrow = compact ?? (headerWidth !== undefined ? headerWidth < 280 : false);
+  const [headerWidth, setHeaderWidth] = useState<number | undefined>(undefined);
 
-  const resolvedBackToAppText =
-    backToAppText === 'Back to Main App' && isNarrow ? 'Back' : backToAppText;
-  const resolvedCancelText =
-    cancelText === 'Cancel' && isNarrow && headerWidth !== undefined && headerWidth < 200 ? '✕' : cancelText;
+  // Adapt labels on narrow screens so text doesn't overflow
+  const isNarrow = compact ?? (headerWidth !== undefined && headerWidth < 280);
+  const isVeryNarrow = headerWidth !== undefined && headerWidth < 200;
 
-  const handleCancel = () => {
+  const displayBackText = backToAppText === 'Back to Main App' && isNarrow ? 'Back' : backToAppText;
+  const displayCancelText = cancelText === 'Cancel' && isNarrow && isVeryNarrow ? '✕' : cancelText;
+
+  const handleCancelPress = () => {
     if (onCancel) {
       onCancel();
     } else {
@@ -70,7 +71,7 @@ export default function PopScreenHeader({
     }
   };
 
-  const handleBackToApp = async () => {
+  const handleBackToAppPress = async () => {
     if (onBackToApp) {
       onBackToApp();
     } else {
@@ -80,16 +81,16 @@ export default function PopScreenHeader({
   };
 
   if (children) {
-    return <View style={[styles.headerContainer, style]}>{children}</View>;
+    return <View style={[styles.container, style]}>{children}</View>;
   }
 
   return (
     <View
-      style={[styles.headerContainer, style]}
+      style={[styles.container, style]}
       onLayout={(e) => {
-        const w = e.nativeEvent?.layout?.width;
-        if (w && w !== headerWidth) {
-          setHeaderWidth(w);
+        const width = e.nativeEvent?.layout?.width;
+        if (width && width !== headerWidth) {
+          setHeaderWidth(width);
         }
       }}
     >
@@ -99,19 +100,19 @@ export default function PopScreenHeader({
             styles.button,
             styles.backButton,
             buttonStyle,
-            pressed && styles.pressed,
+            pressed && styles.buttonPressed,
           ]}
-          onPress={handleBackToApp}
+          onPress={handleBackToAppPress}
           accessibilityRole="button"
-          accessibilityLabel={resolvedBackToAppText}
+          accessibilityLabel={displayBackText}
           testID="header-back-to-app-button"
         >
           <Text style={[styles.backButtonText, buttonTextStyle]} numberOfLines={1}>
-            {resolvedBackToAppText}
+            {displayBackText}
           </Text>
         </Pressable>
       ) : (
-        <View style={styles.buttonPlaceholder} />
+        <View style={styles.buttonSpacer} />
       )}
 
       {title ? (
@@ -126,26 +127,26 @@ export default function PopScreenHeader({
             styles.button,
             styles.cancelButton,
             buttonStyle,
-            pressed && styles.pressed,
+            pressed && styles.buttonPressed,
           ]}
-          onPress={handleCancel}
+          onPress={handleCancelPress}
           accessibilityRole="button"
-          accessibilityLabel={resolvedCancelText}
+          accessibilityLabel={displayCancelText}
           testID="header-cancel-button"
         >
           <Text style={[styles.cancelButtonText, buttonTextStyle]} numberOfLines={1}>
-            {resolvedCancelText}
+            {displayCancelText}
           </Text>
         </Pressable>
       ) : (
-        <View style={styles.buttonPlaceholder} />
+        <View style={styles.buttonSpacer} />
       )}
     </View>
   );
 }
 
 const styles = StyleSheet.create({
-  headerContainer: {
+  container: {
     minHeight: 40,
     flexDirection: 'row',
     alignItems: 'center',
@@ -161,8 +162,6 @@ const styles = StyleSheet.create({
     borderRadius: 6,
     justifyContent: 'center',
     alignItems: 'center',
-    // Buttons shrink (with their text truncating) instead of pushing past
-    // the window edge, so the header always fits the overlay width.
     flexShrink: 1,
     minWidth: 0,
   },
@@ -191,10 +190,11 @@ const styles = StyleSheet.create({
     flexShrink: 1,
     marginHorizontal: 4,
   },
-  buttonPlaceholder: {
+  buttonSpacer: {
     width: 44,
   },
-  pressed: {
+  buttonPressed: {
     opacity: 0.7,
   },
 });
+

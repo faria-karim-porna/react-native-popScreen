@@ -1,11 +1,12 @@
 /**
- * A minimal external store — subscribe/getState/setState pattern,
- * modeled on Zustand's vanilla store. Lives at MODULE scope so both
- * RN surfaces (main app + overlay) import the same instance.
+ * A tiny key-value store that lives at module scope.
+ * Because both the main app and the overlay share the same JS process,
+ * they import the same instance — so state changes made in one surface
+ * instantly appear in the other.
  */
 export declare function createOverlayStore<T extends Record<string, any>>(initialState: T): {
     getState: () => T;
-    setState: (partial: Partial<T> | ((prev: T) => Partial<T>)) => void;
+    setState: (update: Partial<T> | ((prev: T) => Partial<T>)) => void;
     subscribe: (listener: () => void) => () => void;
 };
 export type OverlayStore<T extends Record<string, any>> = ReturnType<typeof createOverlayStore<T>>;

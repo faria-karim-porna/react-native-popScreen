@@ -1,19 +1,18 @@
 "use strict";
-var __importDefault = (this && this.__importDefault) || function (mod) {
-    return (mod && mod.__esModule) ? mod : { "default": mod };
-};
 Object.defineProperty(exports, "__esModule", { value: true });
 exports.default = PopScreenHeader;
 const jsx_runtime_1 = require("react/jsx-runtime");
-const react_1 = __importDefault(require("react"));
+const react_1 = require("react");
 const react_native_1 = require("react-native");
 const PopScreenModule_1 = require("./PopScreenModule");
 function PopScreenHeader({ title = 'Overlay', onCancel, onBackToApp, showCancel = true, showBackToApp = true, cancelText = 'Cancel', backToAppText = 'Back to Main App', compact, style, titleStyle, buttonStyle, buttonTextStyle, children, }) {
-    const [headerWidth, setHeaderWidth] = react_1.default.useState(undefined);
-    const isNarrow = compact !== null && compact !== void 0 ? compact : (headerWidth !== undefined ? headerWidth < 280 : false);
-    const resolvedBackToAppText = backToAppText === 'Back to Main App' && isNarrow ? 'Back' : backToAppText;
-    const resolvedCancelText = cancelText === 'Cancel' && isNarrow && headerWidth !== undefined && headerWidth < 200 ? '✕' : cancelText;
-    const handleCancel = () => {
+    const [headerWidth, setHeaderWidth] = (0, react_1.useState)(undefined);
+    // Adapt labels on narrow screens so text doesn't overflow
+    const isNarrow = compact !== null && compact !== void 0 ? compact : (headerWidth !== undefined && headerWidth < 280);
+    const isVeryNarrow = headerWidth !== undefined && headerWidth < 200;
+    const displayBackText = backToAppText === 'Back to Main App' && isNarrow ? 'Back' : backToAppText;
+    const displayCancelText = cancelText === 'Cancel' && isNarrow && isVeryNarrow ? '✕' : cancelText;
+    const handleCancelPress = () => {
         if (onCancel) {
             onCancel();
         }
@@ -21,7 +20,7 @@ function PopScreenHeader({ title = 'Overlay', onCancel, onBackToApp, showCancel 
             PopScreenModule_1.PopScreenModule.hide();
         }
     };
-    const handleBackToApp = async () => {
+    const handleBackToAppPress = async () => {
         if (onBackToApp) {
             onBackToApp();
         }
@@ -31,28 +30,28 @@ function PopScreenHeader({ title = 'Overlay', onCancel, onBackToApp, showCancel 
         }
     };
     if (children) {
-        return (0, jsx_runtime_1.jsx)(react_native_1.View, { style: [styles.headerContainer, style], children: children });
+        return (0, jsx_runtime_1.jsx)(react_native_1.View, { style: [styles.container, style], children: children });
     }
-    return ((0, jsx_runtime_1.jsxs)(react_native_1.View, { style: [styles.headerContainer, style], onLayout: (e) => {
+    return ((0, jsx_runtime_1.jsxs)(react_native_1.View, { style: [styles.container, style], onLayout: (e) => {
             var _a, _b;
-            const w = (_b = (_a = e.nativeEvent) === null || _a === void 0 ? void 0 : _a.layout) === null || _b === void 0 ? void 0 : _b.width;
-            if (w && w !== headerWidth) {
-                setHeaderWidth(w);
+            const width = (_b = (_a = e.nativeEvent) === null || _a === void 0 ? void 0 : _a.layout) === null || _b === void 0 ? void 0 : _b.width;
+            if (width && width !== headerWidth) {
+                setHeaderWidth(width);
             }
         }, children: [showBackToApp ? ((0, jsx_runtime_1.jsx)(react_native_1.Pressable, { style: ({ pressed }) => [
                     styles.button,
                     styles.backButton,
                     buttonStyle,
-                    pressed && styles.pressed,
-                ], onPress: handleBackToApp, accessibilityRole: "button", accessibilityLabel: resolvedBackToAppText, testID: "header-back-to-app-button", children: (0, jsx_runtime_1.jsx)(react_native_1.Text, { style: [styles.backButtonText, buttonTextStyle], numberOfLines: 1, children: resolvedBackToAppText }) })) : ((0, jsx_runtime_1.jsx)(react_native_1.View, { style: styles.buttonPlaceholder })), title ? ((0, jsx_runtime_1.jsx)(react_native_1.Text, { style: [styles.titleText, titleStyle], numberOfLines: 1, testID: "header-title", children: title })) : null, showCancel ? ((0, jsx_runtime_1.jsx)(react_native_1.Pressable, { style: ({ pressed }) => [
+                    pressed && styles.buttonPressed,
+                ], onPress: handleBackToAppPress, accessibilityRole: "button", accessibilityLabel: displayBackText, testID: "header-back-to-app-button", children: (0, jsx_runtime_1.jsx)(react_native_1.Text, { style: [styles.backButtonText, buttonTextStyle], numberOfLines: 1, children: displayBackText }) })) : ((0, jsx_runtime_1.jsx)(react_native_1.View, { style: styles.buttonSpacer })), title ? ((0, jsx_runtime_1.jsx)(react_native_1.Text, { style: [styles.titleText, titleStyle], numberOfLines: 1, testID: "header-title", children: title })) : null, showCancel ? ((0, jsx_runtime_1.jsx)(react_native_1.Pressable, { style: ({ pressed }) => [
                     styles.button,
                     styles.cancelButton,
                     buttonStyle,
-                    pressed && styles.pressed,
-                ], onPress: handleCancel, accessibilityRole: "button", accessibilityLabel: resolvedCancelText, testID: "header-cancel-button", children: (0, jsx_runtime_1.jsx)(react_native_1.Text, { style: [styles.cancelButtonText, buttonTextStyle], numberOfLines: 1, children: resolvedCancelText }) })) : ((0, jsx_runtime_1.jsx)(react_native_1.View, { style: styles.buttonPlaceholder }))] }));
+                    pressed && styles.buttonPressed,
+                ], onPress: handleCancelPress, accessibilityRole: "button", accessibilityLabel: displayCancelText, testID: "header-cancel-button", children: (0, jsx_runtime_1.jsx)(react_native_1.Text, { style: [styles.cancelButtonText, buttonTextStyle], numberOfLines: 1, children: displayCancelText }) })) : ((0, jsx_runtime_1.jsx)(react_native_1.View, { style: styles.buttonSpacer }))] }));
 }
 const styles = react_native_1.StyleSheet.create({
-    headerContainer: {
+    container: {
         minHeight: 40,
         flexDirection: 'row',
         alignItems: 'center',
@@ -68,8 +67,6 @@ const styles = react_native_1.StyleSheet.create({
         borderRadius: 6,
         justifyContent: 'center',
         alignItems: 'center',
-        // Buttons shrink (with their text truncating) instead of pushing past
-        // the window edge, so the header always fits the overlay width.
         flexShrink: 1,
         minWidth: 0,
     },
@@ -98,10 +95,10 @@ const styles = react_native_1.StyleSheet.create({
         flexShrink: 1,
         marginHorizontal: 4,
     },
-    buttonPlaceholder: {
+    buttonSpacer: {
         width: 44,
     },
-    pressed: {
+    buttonPressed: {
         opacity: 0.7,
     },
 });

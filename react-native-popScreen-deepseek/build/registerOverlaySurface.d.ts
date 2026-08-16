@@ -1,12 +1,8 @@
 import type { ComponentType } from 'react';
 /**
- * Call once, early in the host app's lifecycle (e.g. at the top of
- * index.tsx, alongside the main app's registerRootComponent call), passing
- * the component tree to render inside the floating overlay window.
- *
- * This must match PopScreenReactSurfaceHost's surfaceName parameter
- * exactly, or the native side will attach to a surface name nothing has
- * registered, resulting in a blank overlay window.
+ * Register the component to render inside the floating overlay window.
+ * Call this once in your app's entry file (e.g. index.tsx), alongside
+ * `registerRootComponent`. Calling it more than once is a no-op.
  */
 export declare function registerOverlaySurface(component: ComponentType<any>): void;
 //# sourceMappingURL=registerOverlaySurface.d.ts.map
