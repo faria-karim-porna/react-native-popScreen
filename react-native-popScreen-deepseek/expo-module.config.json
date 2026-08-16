@@ -2,5 +2,6 @@
   "platforms": ["android"],
   "android": {
     "modules": ["com.fariakarim.reactnativepopScreendeepseek.PopScreenModule"]
-  }
+  },
+  "plugin": "./app.plugin.js"
 }
